@@ -1,0 +1,51 @@
+# ============================================================
+# .gitignore — Tesis Text-to-SQL Data Warehouse (Olist)
+# Letakkan di folder utama proyek: C:\tesis\.gitignore
+# ============================================================
+
+# --- RAHASIA (WAJIB, jangan pernah di-commit) ---------------
+.env
+.env.*
+!.env.example
+*.key
+secrets/
+config/local*
+
+# --- Dataset mentah Olist (CSV besar; unduh ulang dari Kaggle)
+olist/
+*.csv
+!soal/*.csv
+!hasil/*.csv
+*.zip
+
+# --- Output build & log lokal PostgreSQL --------------------
+hasil_build.txt
+*.log
+pgdata/
+
+# --- Log mentah eksperimen (besar; arsipkan terpisah) -------
+# Hapus baris di bawah jika ingin log ikut tersimpan di git
+log_mentah/
+
+# --- Python --------------------------------------------------
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.ipynb_checkpoints/
+.pytest_cache/
+
+# --- Editor / IDE --------------------------------------------
+.vscode/
+.idea/
+*.swp
+*~
+
+# --- Sistem operasi ------------------------------------------
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# --- Dokumen sementara Office --------------------------------
+~$*
