@@ -1,0 +1,806 @@
+id,tingkat,topik,butuh_glosarium,pertanyaan,sql_oltp,sql_star,sql_snowflake,urutan_penting,jumlah_baris,catatan
+Q001,L1,status,tidak,Berapa jumlah pesanan yang dibatalkan?,"SELECT COUNT(DISTINCT oi.order_id) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id WHERE o.order_status = 'canceled'","SELECT COUNT(DISTINCT f.order_id) FROM fact_sales f
+JOIN dim_order_status os ON os.order_status_key = f.order_status_key WHERE os.order_status = 'canceled'","SELECT COUNT(DISTINCT f.order_id) FROM fact_sales f
+JOIN dim_order_status os ON os.order_status_key = f.order_status_key WHERE os.order_status = 'canceled'",tidak,1,
+Q002,L1,"pengiriman,waktu",tidak,Berapa total ongkos kirim seluruh item yang dibeli pada tahun 2017?,"SELECT ROUND(SUM(oi.freight_value), 2) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2017","SELECT ROUND(SUM(f.freight_value), 2) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key WHERE d.year = 2017","SELECT ROUND(SUM(f.freight_value), 2) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key WHERE dm.year_key = 2017",tidak,1,
+Q003,L1,waktu,tidak,Berapa jumlah item yang terjual pada bulan Desember 2017?,"SELECT COUNT(*) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2017 AND EXTRACT(MONTH FROM o.order_purchase_timestamp)::int = 12","SELECT COUNT(*) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key WHERE d.year = 2017 AND d.month = 12","SELECT COUNT(*) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key WHERE dm.year_key = 2017 AND dm.month = 12",tidak,1,
+Q004,L1,waktu,ya,Berapa omzet total pada tahun 2018?,"SELECT ROUND(SUM((oi.price + oi.freight_value)), 2) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2018","SELECT ROUND(SUM(f.total_value), 2) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key WHERE d.year = 2018","SELECT ROUND(SUM(f.total_value), 2) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key WHERE dm.year_key = 2018",tidak,1,
+Q005,L1,produk,tidak,Berapa harga barang tertinggi untuk satu item yang pernah terjual?,"SELECT MAX(oi.price) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id",SELECT MAX(f.price) FROM fact_sales f,SELECT MAX(f.price) FROM fact_sales f,tidak,1,
+Q006,L1,pengiriman,tidak,Berapa rata-rata ongkos kirim per item?,"SELECT ROUND(AVG(oi.freight_value), 2) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id","SELECT ROUND(AVG(f.freight_value), 2) FROM fact_sales f","SELECT ROUND(AVG(f.freight_value), 2) FROM fact_sales f",tidak,1,
+Q007,L1,"pelanggan,waktu",ya,Berapa jumlah pelanggan unik yang berbelanja pada tahun 2017?,"SELECT COUNT(DISTINCT cu.customer_unique_id) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN customers cu ON cu.customer_id = o.customer_id WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2017","SELECT COUNT(DISTINCT c.customer_unique_id) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_customer c ON c.customer_key = f.customer_key WHERE d.year = 2017","SELECT COUNT(DISTINCT c.customer_unique_id) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_city cci ON cci.city_key = c.city_key
+JOIN dim_state cst ON cst.state_key = cci.state_key WHERE dm.year_key = 2017",tidak,1,
+Q008,L1,penjual,tidak,Ada berapa penjual berbeda yang pernah menjual barang?,"SELECT COUNT(DISTINCT oi.seller_id) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN sellers se ON se.seller_id = oi.seller_id","SELECT COUNT(DISTINCT s.seller_id) FROM fact_sales f
+JOIN dim_seller s ON s.seller_key = f.seller_key","SELECT COUNT(DISTINCT s.seller_id) FROM fact_sales f
+JOIN dim_seller s ON s.seller_key = f.seller_key
+JOIN dim_city sci ON sci.city_key = s.city_key
+JOIN dim_state sst ON sst.state_key = sci.state_key",tidak,1,
+Q009,L1,"produk,waktu",tidak,Berapa jumlah produk berbeda yang terjual pada kuartal kedua tahun 2018?,"SELECT COUNT(DISTINCT oi.product_id) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN products pr ON pr.product_id = oi.product_id
+JOIN product_category_name_translation t ON t.product_category_name = pr.product_category_name WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2018 AND EXTRACT(QUARTER FROM o.order_purchase_timestamp)::int = 2","SELECT COUNT(DISTINCT p.product_id) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_product p ON p.product_key = f.product_key WHERE d.year = 2018 AND d.quarter = 2","SELECT COUNT(DISTINCT p.product_id) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+JOIN dim_product p ON p.product_key = f.product_key
+JOIN dim_category k ON k.category_key = p.category_key WHERE dm.year_key = 2018 AND dm.quarter = 2",tidak,1,
+Q010,L1,pelanggan,tidak,Berapa jumlah pesanan yang dibuat oleh pelanggan dari negara bagian RJ?,"SELECT COUNT(DISTINCT oi.order_id) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN customers cu ON cu.customer_id = o.customer_id WHERE cu.customer_state = 'RJ'","SELECT COUNT(DISTINCT f.order_id) FROM fact_sales f
+JOIN dim_customer c ON c.customer_key = f.customer_key WHERE c.state = 'RJ'","SELECT COUNT(DISTINCT f.order_id) FROM fact_sales f
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_city cci ON cci.city_key = c.city_key
+JOIN dim_state cst ON cst.state_key = cci.state_key WHERE cst.state_code = 'RJ'",tidak,1,
+Q011,L1,penjual,ya,Berapa jumlah penjual yang berlokasi di negara bagian Parana?,"SELECT COUNT(DISTINCT oi.seller_id) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN sellers se ON se.seller_id = oi.seller_id WHERE se.seller_state = 'PR'","SELECT COUNT(DISTINCT s.seller_id) FROM fact_sales f
+JOIN dim_seller s ON s.seller_key = f.seller_key WHERE s.state = 'PR'","SELECT COUNT(DISTINCT s.seller_id) FROM fact_sales f
+JOIN dim_seller s ON s.seller_key = f.seller_key
+JOIN dim_city sci ON sci.city_key = s.city_key
+JOIN dim_state sst ON sst.state_key = sci.state_key WHERE sst.state_code = 'PR'",tidak,1,
+Q012,L1,produk,ya,"Berapa total nilai barang, tanpa ongkos kirim, dari kategori kesehatan dan kecantikan?","SELECT ROUND(SUM(oi.price), 2) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN products pr ON pr.product_id = oi.product_id
+JOIN product_category_name_translation t ON t.product_category_name = pr.product_category_name WHERE t.product_category_name_english = 'health_beauty'","SELECT ROUND(SUM(f.price), 2) FROM fact_sales f
+JOIN dim_product p ON p.product_key = f.product_key WHERE p.category_name = 'health_beauty'","SELECT ROUND(SUM(f.price), 2) FROM fact_sales f
+JOIN dim_product p ON p.product_key = f.product_key
+JOIN dim_category k ON k.category_key = p.category_key WHERE k.category_name = 'health_beauty'",tidak,1,
+Q013,L1,waktu,tidak,Berapa jumlah item yang dibeli pada hari Minggu?,"SELECT COUNT(*) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id WHERE EXTRACT(ISODOW FROM o.order_purchase_timestamp)::int = 7","SELECT COUNT(*) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key WHERE d.day_of_week = 7","SELECT COUNT(*) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key WHERE d.day_of_week = 7",tidak,1,
+Q014,L1,waktu,tidak,Berapa jumlah pesanan yang dibuat pada akhir pekan selama tahun 2017?,"SELECT COUNT(DISTINCT oi.order_id) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id WHERE (EXTRACT(ISODOW FROM o.order_purchase_timestamp) IN (6, 7)) AND EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2017","SELECT COUNT(DISTINCT f.order_id) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key WHERE d.is_weekend AND d.year = 2017","SELECT COUNT(DISTINCT f.order_id) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key WHERE d.is_weekend AND dm.year_key = 2017",tidak,1,
+Q015,L1,status,tidak,Berapa jumlah pesanan yang statusnya masih dalam pengiriman?,"SELECT COUNT(DISTINCT oi.order_id) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id WHERE o.order_status = 'shipped'","SELECT COUNT(DISTINCT f.order_id) FROM fact_sales f
+JOIN dim_order_status os ON os.order_status_key = f.order_status_key WHERE os.order_status = 'shipped'","SELECT COUNT(DISTINCT f.order_id) FROM fact_sales f
+JOIN dim_order_status os ON os.order_status_key = f.order_status_key WHERE os.order_status = 'shipped'",tidak,1,
+Q016,L1,produk,tidak,Berapa rata-rata berat produk dalam gram per item yang terjual?,"SELECT ROUND(AVG(pr.product_weight_g), 2) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN products pr ON pr.product_id = oi.product_id
+JOIN product_category_name_translation t ON t.product_category_name = pr.product_category_name","SELECT ROUND(AVG(p.weight_g), 2) FROM fact_sales f
+JOIN dim_product p ON p.product_key = f.product_key","SELECT ROUND(AVG(p.weight_g), 2) FROM fact_sales f
+JOIN dim_product p ON p.product_key = f.product_key
+JOIN dim_category k ON k.category_key = p.category_key",tidak,1,
+Q017,L1,"produk,waktu",ya,Berapa jumlah item kategori mainan yang terjual pada tahun 2018?,"SELECT COUNT(*) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN products pr ON pr.product_id = oi.product_id
+JOIN product_category_name_translation t ON t.product_category_name = pr.product_category_name WHERE t.product_category_name_english = 'toys' AND EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2018","SELECT COUNT(*) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_product p ON p.product_key = f.product_key WHERE p.category_name = 'toys' AND d.year = 2018","SELECT COUNT(*) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+JOIN dim_product p ON p.product_key = f.product_key
+JOIN dim_category k ON k.category_key = p.category_key WHERE k.category_name = 'toys' AND dm.year_key = 2018",tidak,1,
+Q018,L1,pelanggan,ya,Berapa jumlah pelanggan unik yang tinggal di kota Curitiba?,"SELECT COUNT(DISTINCT cu.customer_unique_id) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN customers cu ON cu.customer_id = o.customer_id WHERE cu.customer_city = 'curitiba'","SELECT COUNT(DISTINCT c.customer_unique_id) FROM fact_sales f
+JOIN dim_customer c ON c.customer_key = f.customer_key WHERE c.city = 'curitiba'","SELECT COUNT(DISTINCT c.customer_unique_id) FROM fact_sales f
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_city cci ON cci.city_key = c.city_key
+JOIN dim_state cst ON cst.state_key = cci.state_key WHERE cci.city_name = 'curitiba'",tidak,1,
+Q019,L1,pengiriman,tidak,Berapa ongkos kirim paling mahal untuk satu item?,"SELECT MAX(oi.freight_value) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id",SELECT MAX(f.freight_value) FROM fact_sales f,SELECT MAX(f.freight_value) FROM fact_sales f,tidak,1,
+Q020,L1,waktu,tidak,Berapa jumlah pesanan pada bulan Januari 2018?,"SELECT COUNT(DISTINCT oi.order_id) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2018 AND EXTRACT(MONTH FROM o.order_purchase_timestamp)::int = 1","SELECT COUNT(DISTINCT f.order_id) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key WHERE d.year = 2018 AND d.month = 1","SELECT COUNT(DISTINCT f.order_id) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key WHERE dm.year_key = 2018 AND dm.month = 1",tidak,1,
+Q021,L1,"penjual,waktu",tidak,Berapa total harga barang yang dijual oleh penjual dari negara bagian SP pada tahun 2018?,"SELECT ROUND(SUM(oi.price), 2) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN sellers se ON se.seller_id = oi.seller_id WHERE se.seller_state = 'SP' AND EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2018","SELECT ROUND(SUM(f.price), 2) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_seller s ON s.seller_key = f.seller_key WHERE s.state = 'SP' AND d.year = 2018","SELECT ROUND(SUM(f.price), 2) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+JOIN dim_seller s ON s.seller_key = f.seller_key
+JOIN dim_city sci ON sci.city_key = s.city_key
+JOIN dim_state sst ON sst.state_key = sci.state_key WHERE sst.state_code = 'SP' AND dm.year_key = 2018",tidak,1,
+Q022,L1,pengiriman,tidak,Berapa jumlah item yang belum diterima oleh pelanggan (tanggal diterima masih kosong)?,"SELECT COUNT(*) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id WHERE o.order_delivered_customer_date::date IS NULL","SELECT COUNT(*) FROM fact_sales f
+LEFT JOIN dim_date dd ON dd.date_key = f.delivered_customer_date_key WHERE dd.full_date IS NULL","SELECT COUNT(*) FROM fact_sales f
+LEFT JOIN dim_date dd ON dd.date_key = f.delivered_customer_date_key WHERE dd.full_date IS NULL",tidak,1,
+Q023,L1,status,ya,Berapa omzet dari pesanan yang dibatalkan?,"SELECT ROUND(SUM((oi.price + oi.freight_value)), 2) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id WHERE o.order_status = 'canceled'","SELECT ROUND(SUM(f.total_value), 2) FROM fact_sales f
+JOIN dim_order_status os ON os.order_status_key = f.order_status_key WHERE os.order_status = 'canceled'","SELECT ROUND(SUM(f.total_value), 2) FROM fact_sales f
+JOIN dim_order_status os ON os.order_status_key = f.order_status_key WHERE os.order_status = 'canceled'",tidak,1,
+Q024,L1,produk,ya,Berapa jumlah produk berbeda dalam kategori parfum yang pernah terjual?,"SELECT COUNT(DISTINCT oi.product_id) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN products pr ON pr.product_id = oi.product_id
+JOIN product_category_name_translation t ON t.product_category_name = pr.product_category_name WHERE t.product_category_name_english = 'perfumery'","SELECT COUNT(DISTINCT p.product_id) FROM fact_sales f
+JOIN dim_product p ON p.product_key = f.product_key WHERE p.category_name = 'perfumery'","SELECT COUNT(DISTINCT p.product_id) FROM fact_sales f
+JOIN dim_product p ON p.product_key = f.product_key
+JOIN dim_category k ON k.category_key = p.category_key WHERE k.category_name = 'perfumery'",tidak,1,
+Q025,L1,"produk,waktu",tidak,Berapa rata-rata harga barang per item pada kuartal keempat tahun 2017?,"SELECT ROUND(AVG(oi.price), 2) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2017 AND EXTRACT(QUARTER FROM o.order_purchase_timestamp)::int = 4","SELECT ROUND(AVG(f.price), 2) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key WHERE d.year = 2017 AND d.quarter = 4","SELECT ROUND(AVG(f.price), 2) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key WHERE dm.year_key = 2017 AND dm.quarter = 4",tidak,1,
+Q026,L2,waktu,tidak,"Tampilkan nomor bulan dan jumlah pesanan untuk setiap bulan pada tahun 2017, urutkan dari Januari.","SELECT EXTRACT(MONTH FROM o.order_purchase_timestamp)::int, COUNT(DISTINCT oi.order_id) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2017 GROUP BY 1 ORDER BY 1","SELECT d.month, COUNT(DISTINCT f.order_id) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key WHERE d.year = 2017 GROUP BY 1 ORDER BY 1","SELECT dm.month, COUNT(DISTINCT f.order_id) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key WHERE dm.year_key = 2017 GROUP BY 1 ORDER BY 1",ya,12,
+Q027,L2,"pelanggan,waktu",ya,Sebutkan 5 negara bagian pelanggan dengan omzet terbesar pada tahun 2017 beserta omzetnya.,"SELECT cu.customer_state, ROUND(SUM((oi.price + oi.freight_value)), 2) AS omzet FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN customers cu ON cu.customer_id = o.customer_id WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2017 GROUP BY 1 ORDER BY omzet DESC LIMIT 5","SELECT c.state, ROUND(SUM(f.total_value), 2) AS omzet FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_customer c ON c.customer_key = f.customer_key WHERE d.year = 2017 GROUP BY 1 ORDER BY omzet DESC LIMIT 5","SELECT cst.state_code, ROUND(SUM(f.total_value), 2) AS omzet FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_city cci ON cci.city_key = c.city_key
+JOIN dim_state cst ON cst.state_key = cci.state_key WHERE dm.year_key = 2017 GROUP BY 1 ORDER BY omzet DESC LIMIT 5",ya,5,
+Q028,L2,produk,tidak,Sebutkan 10 kategori produk dengan jumlah item terjual terbanyak beserta jumlah itemnya.,"SELECT t.product_category_name_english, COUNT(*) AS n FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN products pr ON pr.product_id = oi.product_id
+JOIN product_category_name_translation t ON t.product_category_name = pr.product_category_name GROUP BY 1 ORDER BY n DESC LIMIT 10","SELECT p.category_name, COUNT(*) AS n FROM fact_sales f
+JOIN dim_product p ON p.product_key = f.product_key GROUP BY 1 ORDER BY n DESC LIMIT 10","SELECT k.category_name, COUNT(*) AS n FROM fact_sales f
+JOIN dim_product p ON p.product_key = f.product_key
+JOIN dim_category k ON k.category_key = p.category_key GROUP BY 1 ORDER BY n DESC LIMIT 10",ya,10,
+Q029,L2,"pengiriman,waktu",tidak,"Tampilkan nomor kuartal dan total ongkos kirim untuk setiap kuartal tahun 2018, urutkan per kuartal.","SELECT EXTRACT(QUARTER FROM o.order_purchase_timestamp)::int, ROUND(SUM(oi.freight_value), 2) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2018 GROUP BY 1 ORDER BY 1","SELECT d.quarter, ROUND(SUM(f.freight_value), 2) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key WHERE d.year = 2018 GROUP BY 1 ORDER BY 1","SELECT dm.quarter, ROUND(SUM(f.freight_value), 2) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key WHERE dm.year_key = 2018 GROUP BY 1 ORDER BY 1",ya,3,
+Q030,L2,status,tidak,"Tampilkan setiap status pesanan beserta jumlah itemnya, urutkan dari yang terbanyak.","SELECT o.order_status, COUNT(*) AS n FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id GROUP BY 1 ORDER BY n DESC","SELECT os.order_status, COUNT(*) AS n FROM fact_sales f
+JOIN dim_order_status os ON os.order_status_key = f.order_status_key GROUP BY 1 ORDER BY n DESC","SELECT os.order_status, COUNT(*) AS n FROM fact_sales f
+JOIN dim_order_status os ON os.order_status_key = f.order_status_key GROUP BY 1 ORDER BY n DESC",ya,6,
+Q031,L2,"penjual,waktu",tidak,Sebutkan 5 kota penjual dengan jumlah item terjual terbanyak pada tahun 2018 beserta jumlah itemnya.,"SELECT se.seller_city, COUNT(*) AS n FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN sellers se ON se.seller_id = oi.seller_id WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2018 GROUP BY 1 ORDER BY n DESC LIMIT 5","SELECT s.city, COUNT(*) AS n FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_seller s ON s.seller_key = f.seller_key WHERE d.year = 2018 GROUP BY 1 ORDER BY n DESC LIMIT 5","SELECT sci.city_name, COUNT(*) AS n FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+JOIN dim_seller s ON s.seller_key = f.seller_key
+JOIN dim_city sci ON sci.city_key = s.city_key
+JOIN dim_state sst ON sst.state_key = sci.state_key WHERE dm.year_key = 2018 GROUP BY 1 ORDER BY n DESC LIMIT 5",ya,5,
+Q032,L2,waktu,tidak,"Untuk tahun 2017, tampilkan nomor hari dalam seminggu (1 = Senin sampai 7 = Minggu) dan jumlah pesanannya, urutkan dari Senin.","SELECT EXTRACT(ISODOW FROM o.order_purchase_timestamp)::int, COUNT(DISTINCT oi.order_id) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2017 GROUP BY 1 ORDER BY 1","SELECT d.day_of_week, COUNT(DISTINCT f.order_id) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key WHERE d.year = 2017 GROUP BY 1 ORDER BY 1","SELECT d.day_of_week, COUNT(DISTINCT f.order_id) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key WHERE dm.year_key = 2017 GROUP BY 1 ORDER BY 1",ya,7,
+Q033,L2,"penjual,produk",tidak,Sebutkan 5 negara bagian penjual dengan rata-rata harga barang per item tertinggi beserta rata-ratanya.,"SELECT se.seller_state, ROUND(AVG(oi.price), 2) AS r FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN sellers se ON se.seller_id = oi.seller_id GROUP BY 1 ORDER BY r DESC LIMIT 5","SELECT s.state, ROUND(AVG(f.price), 2) AS r FROM fact_sales f
+JOIN dim_seller s ON s.seller_key = f.seller_key GROUP BY 1 ORDER BY r DESC LIMIT 5","SELECT sst.state_code, ROUND(AVG(f.price), 2) AS r FROM fact_sales f
+JOIN dim_seller s ON s.seller_key = f.seller_key
+JOIN dim_city sci ON sci.city_key = s.city_key
+JOIN dim_state sst ON sst.state_key = sci.state_key GROUP BY 1 ORDER BY r DESC LIMIT 5",ya,5,
+Q034,L2,"produk,pengiriman,waktu",tidak,Sebutkan 3 kategori produk dengan total ongkos kirim terbesar pada bulan November 2017 beserta totalnya.,"SELECT t.product_category_name_english, ROUND(SUM(oi.freight_value), 2) AS x FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN products pr ON pr.product_id = oi.product_id
+JOIN product_category_name_translation t ON t.product_category_name = pr.product_category_name WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2017 AND EXTRACT(MONTH FROM o.order_purchase_timestamp)::int = 11 GROUP BY 1 ORDER BY x DESC LIMIT 3","SELECT p.category_name, ROUND(SUM(f.freight_value), 2) AS x FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_product p ON p.product_key = f.product_key WHERE d.year = 2017 AND d.month = 11 GROUP BY 1 ORDER BY x DESC LIMIT 3","SELECT k.category_name, ROUND(SUM(f.freight_value), 2) AS x FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+JOIN dim_product p ON p.product_key = f.product_key
+JOIN dim_category k ON k.category_key = p.category_key WHERE dm.year_key = 2017 AND dm.month = 11 GROUP BY 1 ORDER BY x DESC LIMIT 3",ya,3,
+Q035,L2,"pelanggan,waktu",ya,"Tampilkan jumlah pelanggan unik untuk setiap tahun, urutkan per tahun.","SELECT EXTRACT(YEAR FROM o.order_purchase_timestamp)::int, COUNT(DISTINCT cu.customer_unique_id) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN customers cu ON cu.customer_id = o.customer_id GROUP BY 1 ORDER BY 1","SELECT d.year, COUNT(DISTINCT c.customer_unique_id) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_customer c ON c.customer_key = f.customer_key GROUP BY 1 ORDER BY 1","SELECT dm.year_key, COUNT(DISTINCT c.customer_unique_id) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_city cci ON cci.city_key = c.city_key
+JOIN dim_state cst ON cst.state_key = cci.state_key GROUP BY 1 ORDER BY 1",ya,2,
+Q036,L2,"pelanggan,waktu",tidak,"Sebutkan 5 negara bagian pelanggan dengan jumlah pesanan paling sedikit pada tahun 2018 beserta jumlah pesanannya, mulai dari yang paling sedikit.","SELECT cu.customer_state, COUNT(DISTINCT oi.order_id) AS n FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN customers cu ON cu.customer_id = o.customer_id WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2018 GROUP BY 1 ORDER BY n ASC LIMIT 5","SELECT c.state, COUNT(DISTINCT f.order_id) AS n FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_customer c ON c.customer_key = f.customer_key WHERE d.year = 2018 GROUP BY 1 ORDER BY n ASC LIMIT 5","SELECT cst.state_code, COUNT(DISTINCT f.order_id) AS n FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_city cci ON cci.city_key = c.city_key
+JOIN dim_state cst ON cst.state_key = cci.state_key WHERE dm.year_key = 2018 GROUP BY 1 ORDER BY n ASC LIMIT 5",ya,5,
+Q037,L2,waktu,ya,Tampilkan nomor bulan dan omzet setiap bulan dari Januari sampai Juni 2018.,"SELECT EXTRACT(MONTH FROM o.order_purchase_timestamp)::int, ROUND(SUM((oi.price + oi.freight_value)), 2) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2018 AND EXTRACT(MONTH FROM o.order_purchase_timestamp)::int BETWEEN 1 AND 6 GROUP BY 1 ORDER BY 1","SELECT d.month, ROUND(SUM(f.total_value), 2) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key WHERE d.year = 2018 AND d.month BETWEEN 1 AND 6 GROUP BY 1 ORDER BY 1","SELECT dm.month, ROUND(SUM(f.total_value), 2) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key WHERE dm.year_key = 2018 AND dm.month BETWEEN 1 AND 6 GROUP BY 1 ORDER BY 1",ya,6,
+Q038,L2,waktu,tidak,"Pada tahun 2018, berapa jumlah item yang dibeli pada akhir pekan dan berapa yang dibeli pada hari kerja? Tampilkan penanda akhir pekan (benar/salah) dan jumlah itemnya.","SELECT (EXTRACT(ISODOW FROM o.order_purchase_timestamp) IN (6, 7)), COUNT(*) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2018 GROUP BY 1","SELECT d.is_weekend, COUNT(*) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key WHERE d.year = 2018 GROUP BY 1","SELECT d.is_weekend, COUNT(*) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key WHERE dm.year_key = 2018 GROUP BY 1",tidak,2,
+Q039,L2,"produk,waktu",tidak,Sebutkan 5 kategori produk dengan rata-rata harga barang per item tertinggi pada tahun 2017 beserta rata-ratanya.,"SELECT t.product_category_name_english, ROUND(AVG(oi.price), 2) AS r FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN products pr ON pr.product_id = oi.product_id
+JOIN product_category_name_translation t ON t.product_category_name = pr.product_category_name WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2017 GROUP BY 1 ORDER BY r DESC LIMIT 5","SELECT p.category_name, ROUND(AVG(f.price), 2) AS r FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_product p ON p.product_key = f.product_key WHERE d.year = 2017 GROUP BY 1 ORDER BY r DESC LIMIT 5","SELECT k.category_name, ROUND(AVG(f.price), 2) AS r FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+JOIN dim_product p ON p.product_key = f.product_key
+JOIN dim_category k ON k.category_key = p.category_key WHERE dm.year_key = 2017 GROUP BY 1 ORDER BY r DESC LIMIT 5",ya,5,
+Q040,L2,"penjual,waktu",tidak,Sebutkan ID 10 penjual dengan total harga barang terjual terbesar pada tahun 2017 beserta totalnya.,"SELECT oi.seller_id, ROUND(SUM(oi.price), 2) AS x FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN sellers se ON se.seller_id = oi.seller_id WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2017 GROUP BY 1 ORDER BY x DESC LIMIT 10","SELECT s.seller_id, ROUND(SUM(f.price), 2) AS x FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_seller s ON s.seller_key = f.seller_key WHERE d.year = 2017 GROUP BY 1 ORDER BY x DESC LIMIT 10","SELECT s.seller_id, ROUND(SUM(f.price), 2) AS x FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+JOIN dim_seller s ON s.seller_key = f.seller_key
+JOIN dim_city sci ON sci.city_key = s.city_key
+JOIN dim_state sst ON sst.state_key = sci.state_key WHERE dm.year_key = 2017 GROUP BY 1 ORDER BY x DESC LIMIT 10",ya,10,
+Q041,L2,"pelanggan,produk",ya,"Untuk kategori jam tangan dan hadiah, sebutkan 5 negara bagian pelanggan dengan jumlah pesanan terbanyak beserta jumlah pesanannya.","SELECT cu.customer_state, COUNT(DISTINCT oi.order_id) AS n FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN customers cu ON cu.customer_id = o.customer_id
+JOIN products pr ON pr.product_id = oi.product_id
+JOIN product_category_name_translation t ON t.product_category_name = pr.product_category_name WHERE t.product_category_name_english = 'watches_gifts' GROUP BY 1 ORDER BY n DESC LIMIT 5","SELECT c.state, COUNT(DISTINCT f.order_id) AS n FROM fact_sales f
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_product p ON p.product_key = f.product_key WHERE p.category_name = 'watches_gifts' GROUP BY 1 ORDER BY n DESC LIMIT 5","SELECT cst.state_code, COUNT(DISTINCT f.order_id) AS n FROM fact_sales f
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_city cci ON cci.city_key = c.city_key
+JOIN dim_state cst ON cst.state_key = cci.state_key
+JOIN dim_product p ON p.product_key = f.product_key
+JOIN dim_category k ON k.category_key = p.category_key WHERE k.category_name = 'watches_gifts' GROUP BY 1 ORDER BY n DESC LIMIT 5",ya,5,
+Q042,L2,"pelanggan,produk",ya,"Untuk pelanggan dari negara bagian Minas Gerais, sebutkan 5 kategori produk dengan total nilai barang (tanpa ongkir) terbesar beserta totalnya.","SELECT t.product_category_name_english, ROUND(SUM(oi.price), 2) AS x FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN customers cu ON cu.customer_id = o.customer_id
+JOIN products pr ON pr.product_id = oi.product_id
+JOIN product_category_name_translation t ON t.product_category_name = pr.product_category_name WHERE cu.customer_state = 'MG' GROUP BY 1 ORDER BY x DESC LIMIT 5","SELECT p.category_name, ROUND(SUM(f.price), 2) AS x FROM fact_sales f
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_product p ON p.product_key = f.product_key WHERE c.state = 'MG' GROUP BY 1 ORDER BY x DESC LIMIT 5","SELECT k.category_name, ROUND(SUM(f.price), 2) AS x FROM fact_sales f
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_city cci ON cci.city_key = c.city_key
+JOIN dim_state cst ON cst.state_key = cci.state_key
+JOIN dim_product p ON p.product_key = f.product_key
+JOIN dim_category k ON k.category_key = p.category_key WHERE cst.state_code = 'MG' GROUP BY 1 ORDER BY x DESC LIMIT 5",ya,5,
+Q043,L2,"status,waktu",tidak,"Tampilkan nomor bulan dan jumlah pesanan yang dibatalkan untuk setiap bulan pada tahun 2018, urutkan per bulan.","SELECT EXTRACT(MONTH FROM o.order_purchase_timestamp)::int, COUNT(DISTINCT oi.order_id) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id WHERE o.order_status = 'canceled' AND EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2018 GROUP BY 1 ORDER BY 1","SELECT d.month, COUNT(DISTINCT f.order_id) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_order_status os ON os.order_status_key = f.order_status_key WHERE os.order_status = 'canceled' AND d.year = 2018 GROUP BY 1 ORDER BY 1","SELECT dm.month, COUNT(DISTINCT f.order_id) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+JOIN dim_order_status os ON os.order_status_key = f.order_status_key WHERE os.order_status = 'canceled' AND dm.year_key = 2018 GROUP BY 1 ORDER BY 1",ya,8,
+Q044,L2,pelanggan,ya,Sebutkan 5 kota pelanggan di negara bagian RS dengan omzet terbesar beserta omzetnya.,"SELECT cu.customer_city, ROUND(SUM((oi.price + oi.freight_value)), 2) AS x FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN customers cu ON cu.customer_id = o.customer_id WHERE cu.customer_state = 'RS' GROUP BY 1 ORDER BY x DESC LIMIT 5","SELECT c.city, ROUND(SUM(f.total_value), 2) AS x FROM fact_sales f
+JOIN dim_customer c ON c.customer_key = f.customer_key WHERE c.state = 'RS' GROUP BY 1 ORDER BY x DESC LIMIT 5","SELECT cci.city_name, ROUND(SUM(f.total_value), 2) AS x FROM fact_sales f
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_city cci ON cci.city_key = c.city_key
+JOIN dim_state cst ON cst.state_key = cci.state_key WHERE cst.state_code = 'RS' GROUP BY 1 ORDER BY x DESC LIMIT 5",ya,5,
+Q045,L2,"pelanggan,pengiriman",tidak,Sebutkan 5 negara bagian pelanggan dengan rata-rata ongkos kirim per item termahal beserta rata-ratanya.,"SELECT cu.customer_state, ROUND(AVG(oi.freight_value), 2) AS r FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN customers cu ON cu.customer_id = o.customer_id GROUP BY 1 ORDER BY r DESC LIMIT 5","SELECT c.state, ROUND(AVG(f.freight_value), 2) AS r FROM fact_sales f
+JOIN dim_customer c ON c.customer_key = f.customer_key GROUP BY 1 ORDER BY r DESC LIMIT 5","SELECT cst.state_code, ROUND(AVG(f.freight_value), 2) AS r FROM fact_sales f
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_city cci ON cci.city_key = c.city_key
+JOIN dim_state cst ON cst.state_key = cci.state_key GROUP BY 1 ORDER BY r DESC LIMIT 5",ya,5,
+Q046,L2,"produk,waktu",tidak,"Pada kuartal pertama 2018, sebutkan 10 kategori dengan jumlah produk berbeda yang terjual terbanyak beserta jumlah produknya.","SELECT t.product_category_name_english, COUNT(DISTINCT oi.product_id) AS n FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN products pr ON pr.product_id = oi.product_id
+JOIN product_category_name_translation t ON t.product_category_name = pr.product_category_name WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2018 AND EXTRACT(QUARTER FROM o.order_purchase_timestamp)::int = 1 GROUP BY 1 ORDER BY n DESC LIMIT 10","SELECT p.category_name, COUNT(DISTINCT p.product_id) AS n FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_product p ON p.product_key = f.product_key WHERE d.year = 2018 AND d.quarter = 1 GROUP BY 1 ORDER BY n DESC LIMIT 10","SELECT k.category_name, COUNT(DISTINCT p.product_id) AS n FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+JOIN dim_product p ON p.product_key = f.product_key
+JOIN dim_category k ON k.category_key = p.category_key WHERE dm.year_key = 2018 AND dm.quarter = 1 GROUP BY 1 ORDER BY n DESC LIMIT 10",ya,10,
+Q047,L2,"status,waktu",tidak,"Untuk item yang dibeli pada tahun 2018, tampilkan setiap status pesanan beserta jumlah itemnya.","SELECT o.order_status, COUNT(*) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2018 GROUP BY 1","SELECT os.order_status, COUNT(*) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_order_status os ON os.order_status_key = f.order_status_key WHERE d.year = 2018 GROUP BY 1","SELECT os.order_status, COUNT(*) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+JOIN dim_order_status os ON os.order_status_key = f.order_status_key WHERE dm.year_key = 2018 GROUP BY 1",tidak,5,
+Q048,L2,waktu,tidak,"Tampilkan tahun, nomor kuartal, dan total harga barang untuk setiap kuartal, urutkan secara kronologis.","SELECT EXTRACT(YEAR FROM o.order_purchase_timestamp)::int, EXTRACT(QUARTER FROM o.order_purchase_timestamp)::int, ROUND(SUM(oi.price), 2) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id GROUP BY 1, 2 ORDER BY 1, 2","SELECT d.year, d.quarter, ROUND(SUM(f.price), 2) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key GROUP BY 1, 2 ORDER BY 1, 2","SELECT dm.year_key, dm.quarter, ROUND(SUM(f.price), 2) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key GROUP BY 1, 2 ORDER BY 1, 2",ya,7,
+Q049,L2,"penjual,produk",ya,"Untuk kategori furnitur dan dekorasi, sebutkan ID 5 penjual dengan jumlah pesanan terbanyak beserta jumlah pesanannya.","SELECT oi.seller_id, COUNT(DISTINCT oi.order_id) AS n FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN sellers se ON se.seller_id = oi.seller_id
+JOIN products pr ON pr.product_id = oi.product_id
+JOIN product_category_name_translation t ON t.product_category_name = pr.product_category_name WHERE t.product_category_name_english = 'furniture_decor' GROUP BY 1 ORDER BY n DESC LIMIT 5","SELECT s.seller_id, COUNT(DISTINCT f.order_id) AS n FROM fact_sales f
+JOIN dim_seller s ON s.seller_key = f.seller_key
+JOIN dim_product p ON p.product_key = f.product_key WHERE p.category_name = 'furniture_decor' GROUP BY 1 ORDER BY n DESC LIMIT 5","SELECT s.seller_id, COUNT(DISTINCT f.order_id) AS n FROM fact_sales f
+JOIN dim_seller s ON s.seller_key = f.seller_key
+JOIN dim_city sci ON sci.city_key = s.city_key
+JOIN dim_state sst ON sst.state_key = sci.state_key
+JOIN dim_product p ON p.product_key = f.product_key
+JOIN dim_category k ON k.category_key = p.category_key WHERE k.category_name = 'furniture_decor' GROUP BY 1 ORDER BY n DESC LIMIT 5",ya,5,
+Q050,L2,"penjual,waktu",tidak,"Untuk penjual di negara bagian SP, tampilkan nomor bulan dan jumlah item terjual setiap bulan selama tahun 2017, urutkan per bulan.","SELECT EXTRACT(MONTH FROM o.order_purchase_timestamp)::int, COUNT(*) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN sellers se ON se.seller_id = oi.seller_id WHERE se.seller_state = 'SP' AND EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2017 GROUP BY 1 ORDER BY 1","SELECT d.month, COUNT(*) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_seller s ON s.seller_key = f.seller_key WHERE s.state = 'SP' AND d.year = 2017 GROUP BY 1 ORDER BY 1","SELECT dm.month, COUNT(*) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+JOIN dim_seller s ON s.seller_key = f.seller_key
+JOIN dim_city sci ON sci.city_key = s.city_key
+JOIN dim_state sst ON sst.state_key = sci.state_key WHERE sst.state_code = 'SP' AND dm.year_key = 2017 GROUP BY 1 ORDER BY 1",ya,12,
+Q051,L3,"produk,waktu",ya,"Tampilkan kategori produk yang omzetnya pada kuartal pertama 2018 lebih dari 100.000 BRL beserta omzetnya, urutkan dari yang terbesar.","SELECT t.product_category_name_english, ROUND(SUM((oi.price + oi.freight_value)), 2) AS x FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN products pr ON pr.product_id = oi.product_id
+JOIN product_category_name_translation t ON t.product_category_name = pr.product_category_name WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2018 AND EXTRACT(QUARTER FROM o.order_purchase_timestamp)::int = 1 GROUP BY 1 HAVING SUM((oi.price + oi.freight_value)) > 100000 ORDER BY x DESC","SELECT p.category_name, ROUND(SUM(f.total_value), 2) AS x FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_product p ON p.product_key = f.product_key WHERE d.year = 2018 AND d.quarter = 1 GROUP BY 1 HAVING SUM(f.total_value) > 100000 ORDER BY x DESC","SELECT k.category_name, ROUND(SUM(f.total_value), 2) AS x FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+JOIN dim_product p ON p.product_key = f.product_key
+JOIN dim_category k ON k.category_key = p.category_key WHERE dm.year_key = 2018 AND dm.quarter = 1 GROUP BY 1 HAVING SUM(f.total_value) > 100000 ORDER BY x DESC",ya,11,
+Q052,L3,"pelanggan,waktu",ya,"Pada tahun 2017, sebutkan 5 negara bagian pelanggan dengan rata-rata nilai pesanan (AOV) tertinggi beserta nilainya.","SELECT cu.customer_state, ROUND(SUM((oi.price + oi.freight_value)) / COUNT(DISTINCT oi.order_id), 2) AS aov FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN customers cu ON cu.customer_id = o.customer_id WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2017 GROUP BY 1 ORDER BY aov DESC LIMIT 5","SELECT c.state, ROUND(SUM(f.total_value) / COUNT(DISTINCT f.order_id), 2) AS aov FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_customer c ON c.customer_key = f.customer_key WHERE d.year = 2017 GROUP BY 1 ORDER BY aov DESC LIMIT 5","SELECT cst.state_code, ROUND(SUM(f.total_value) / COUNT(DISTINCT f.order_id), 2) AS aov FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_city cci ON cci.city_key = c.city_key
+JOIN dim_state cst ON cst.state_key = cci.state_key WHERE dm.year_key = 2017 GROUP BY 1 ORDER BY aov DESC LIMIT 5",ya,5,
+Q053,L3,"pengiriman,pelanggan",ya,"Untuk pesanan yang sudah diterima pelanggan, sebutkan 5 negara bagian pelanggan dengan rata-rata lama pengiriman tercepat (dalam hari) beserta rata-ratanya.","SELECT st, ROUND(AVG(lama), 2) AS r FROM (SELECT DISTINCT oi.order_id AS oid, cu.customer_state AS st, o.order_delivered_customer_date::date - o.order_purchase_timestamp::date AS lama FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN customers cu ON cu.customer_id = o.customer_id WHERE o.order_delivered_customer_date::date IS NOT NULL) x GROUP BY 1 ORDER BY r ASC LIMIT 5","SELECT st, ROUND(AVG(lama), 2) AS r FROM (SELECT DISTINCT f.order_id AS oid, c.state AS st, dd.full_date - d.full_date AS lama FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+LEFT JOIN dim_date dd ON dd.date_key = f.delivered_customer_date_key
+JOIN dim_customer c ON c.customer_key = f.customer_key WHERE dd.full_date IS NOT NULL) x GROUP BY 1 ORDER BY r ASC LIMIT 5","SELECT st, ROUND(AVG(lama), 2) AS r FROM (SELECT DISTINCT f.order_id AS oid, cst.state_code AS st, dd.full_date - d.full_date AS lama FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+LEFT JOIN dim_date dd ON dd.date_key = f.delivered_customer_date_key
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_city cci ON cci.city_key = c.city_key
+JOIN dim_state cst ON cst.state_key = cci.state_key WHERE dd.full_date IS NOT NULL) x GROUP BY 1 ORDER BY r ASC LIMIT 5",tidak,5,
+Q054,L3,"pengiriman,waktu",ya,"Untuk setiap tahun pembelian, berapa persen pesanan yang terlambat dari seluruh pesanan yang sudah diterima pelanggan? Tampilkan tahun dan persentasenya.","SELECT yr, ROUND(100.0 * SUM(CASE WHEN tl THEN 1 ELSE 0 END) / COUNT(*), 2) FROM (SELECT DISTINCT oi.order_id AS oid, EXTRACT(YEAR FROM o.order_purchase_timestamp)::int AS yr, (o.order_delivered_customer_date::date > o.order_estimated_delivery_date::date) AS tl FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id WHERE o.order_delivered_customer_date::date IS NOT NULL) x GROUP BY 1 ORDER BY 1","SELECT yr, ROUND(100.0 * SUM(CASE WHEN tl THEN 1 ELSE 0 END) / COUNT(*), 2) FROM (SELECT DISTINCT f.order_id AS oid, d.year AS yr, (dd.full_date > de.full_date) AS tl FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+LEFT JOIN dim_date dd ON dd.date_key = f.delivered_customer_date_key
+JOIN dim_date de ON de.date_key = f.estimated_delivery_date_key WHERE dd.full_date IS NOT NULL) x GROUP BY 1 ORDER BY 1","SELECT yr, ROUND(100.0 * SUM(CASE WHEN tl THEN 1 ELSE 0 END) / COUNT(*), 2) FROM (SELECT DISTINCT f.order_id AS oid, dm.year_key AS yr, (dd.full_date > de.full_date) AS tl FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+LEFT JOIN dim_date dd ON dd.date_key = f.delivered_customer_date_key
+JOIN dim_date de ON de.date_key = f.estimated_delivery_date_key WHERE dd.full_date IS NOT NULL) x GROUP BY 1 ORDER BY 1",ya,2,
+Q055,L3,pelanggan,ya,Negara bagian pelanggan mana saja yang memiliki lebih dari 5.000 pelanggan unik? Tampilkan kode negara bagian dan jumlah pelanggannya.,"SELECT cu.customer_state, COUNT(DISTINCT cu.customer_unique_id) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN customers cu ON cu.customer_id = o.customer_id GROUP BY 1 HAVING COUNT(DISTINCT cu.customer_unique_id) > 5000","SELECT c.state, COUNT(DISTINCT c.customer_unique_id) FROM fact_sales f
+JOIN dim_customer c ON c.customer_key = f.customer_key GROUP BY 1 HAVING COUNT(DISTINCT c.customer_unique_id) > 5000","SELECT cst.state_code, COUNT(DISTINCT c.customer_unique_id) FROM fact_sales f
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_city cci ON cci.city_key = c.city_key
+JOIN dim_state cst ON cst.state_key = cci.state_key GROUP BY 1 HAVING COUNT(DISTINCT c.customer_unique_id) > 5000",tidak,4,
+Q056,L3,"produk,penjual",tidak,"Kategori produk mana saja yang dijual oleh lebih dari 200 penjual berbeda? Tampilkan kategori dan jumlah penjualnya, urutkan dari yang terbanyak.","SELECT t.product_category_name_english, COUNT(DISTINCT oi.seller_id) AS n FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN sellers se ON se.seller_id = oi.seller_id
+JOIN products pr ON pr.product_id = oi.product_id
+JOIN product_category_name_translation t ON t.product_category_name = pr.product_category_name GROUP BY 1 HAVING COUNT(DISTINCT oi.seller_id) > 200 ORDER BY n DESC","SELECT p.category_name, COUNT(DISTINCT s.seller_id) AS n FROM fact_sales f
+JOIN dim_seller s ON s.seller_key = f.seller_key
+JOIN dim_product p ON p.product_key = f.product_key GROUP BY 1 HAVING COUNT(DISTINCT s.seller_id) > 200 ORDER BY n DESC","SELECT k.category_name, COUNT(DISTINCT s.seller_id) AS n FROM fact_sales f
+JOIN dim_seller s ON s.seller_key = f.seller_key
+JOIN dim_city sci ON sci.city_key = s.city_key
+JOIN dim_state sst ON sst.state_key = sci.state_key
+JOIN dim_product p ON p.product_key = f.product_key
+JOIN dim_category k ON k.category_key = p.category_key GROUP BY 1 HAVING COUNT(DISTINCT s.seller_id) > 200 ORDER BY n DESC",ya,11,
+Q057,L3,"waktu,pelanggan",ya,"Untuk setiap kuartal tahun 2017, tampilkan nomor kuartal, jumlah pesanan, jumlah pelanggan unik, dan omzetnya.","SELECT EXTRACT(QUARTER FROM o.order_purchase_timestamp)::int, COUNT(DISTINCT oi.order_id), COUNT(DISTINCT cu.customer_unique_id), ROUND(SUM((oi.price + oi.freight_value)), 2) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN customers cu ON cu.customer_id = o.customer_id WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2017 GROUP BY 1 ORDER BY 1","SELECT d.quarter, COUNT(DISTINCT f.order_id), COUNT(DISTINCT c.customer_unique_id), ROUND(SUM(f.total_value), 2) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_customer c ON c.customer_key = f.customer_key WHERE d.year = 2017 GROUP BY 1 ORDER BY 1","SELECT dm.quarter, COUNT(DISTINCT f.order_id), COUNT(DISTINCT c.customer_unique_id), ROUND(SUM(f.total_value), 2) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_city cci ON cci.city_key = c.city_key
+JOIN dim_state cst ON cst.state_key = cci.state_key WHERE dm.year_key = 2017 GROUP BY 1 ORDER BY 1",ya,4,
+Q058,L3,"penjual,pelanggan",tidak,"Sebutkan 5 pasangan negara bagian penjual dan negara bagian pelanggan dengan jumlah item terbanyak. Tampilkan negara bagian penjual, negara bagian pelanggan, dan jumlah itemnya.","SELECT se.seller_state, cu.customer_state, COUNT(*) AS n FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN customers cu ON cu.customer_id = o.customer_id
+JOIN sellers se ON se.seller_id = oi.seller_id GROUP BY 1, 2 ORDER BY n DESC LIMIT 5","SELECT s.state, c.state, COUNT(*) AS n FROM fact_sales f
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_seller s ON s.seller_key = f.seller_key GROUP BY 1, 2 ORDER BY n DESC LIMIT 5","SELECT sst.state_code, cst.state_code, COUNT(*) AS n FROM fact_sales f
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_city cci ON cci.city_key = c.city_key
+JOIN dim_state cst ON cst.state_key = cci.state_key
+JOIN dim_seller s ON s.seller_key = f.seller_key
+JOIN dim_city sci ON sci.city_key = s.city_key
+JOIN dim_state sst ON sst.state_key = sci.state_key GROUP BY 1, 2 ORDER BY n DESC LIMIT 5",ya,5,
+Q059,L3,"pelanggan,waktu",tidak,Kota pelanggan mana saja di negara bagian SP yang memiliki lebih dari 1.000 pesanan pada tahun 2018? Tampilkan nama kota dan jumlah pesanannya.,"SELECT cu.customer_city, COUNT(DISTINCT oi.order_id) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN customers cu ON cu.customer_id = o.customer_id WHERE cu.customer_state = 'SP' AND EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2018 GROUP BY 1 HAVING COUNT(DISTINCT oi.order_id) > 1000","SELECT c.city, COUNT(DISTINCT f.order_id) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_customer c ON c.customer_key = f.customer_key WHERE c.state = 'SP' AND d.year = 2018 GROUP BY 1 HAVING COUNT(DISTINCT f.order_id) > 1000","SELECT cci.city_name, COUNT(DISTINCT f.order_id) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_city cci ON cci.city_key = c.city_key
+JOIN dim_state cst ON cst.state_key = cci.state_key WHERE cst.state_code = 'SP' AND dm.year_key = 2018 GROUP BY 1 HAVING COUNT(DISTINCT f.order_id) > 1000",tidak,1,
+Q060,L3,"produk,pengiriman",tidak,"Untuk item dengan berat produk lebih dari 10.000 gram, dan hanya untuk kategori yang memiliki minimal 50 item seperti itu, sebutkan 10 kategori dengan rata-rata ongkos kirim termahal beserta rata-ratanya.","SELECT t.product_category_name_english, ROUND(AVG(oi.freight_value), 2) AS r FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN products pr ON pr.product_id = oi.product_id
+JOIN product_category_name_translation t ON t.product_category_name = pr.product_category_name WHERE pr.product_weight_g > 10000 GROUP BY 1 HAVING COUNT(*) >= 50 ORDER BY r DESC LIMIT 10","SELECT p.category_name, ROUND(AVG(f.freight_value), 2) AS r FROM fact_sales f
+JOIN dim_product p ON p.product_key = f.product_key WHERE p.weight_g > 10000 GROUP BY 1 HAVING COUNT(*) >= 50 ORDER BY r DESC LIMIT 10","SELECT k.category_name, ROUND(AVG(f.freight_value), 2) AS r FROM fact_sales f
+JOIN dim_product p ON p.product_key = f.product_key
+JOIN dim_category k ON k.category_key = p.category_key WHERE p.weight_g > 10000 GROUP BY 1 HAVING COUNT(*) >= 50 ORDER BY r DESC LIMIT 10",ya,10,
+Q061,L3,status,tidak,"Untuk setiap status pesanan selain terkirim (delivered), tampilkan status, jumlah pesanan, dan total harga barangnya.","SELECT o.order_status, COUNT(DISTINCT oi.order_id), ROUND(SUM(oi.price), 2) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id WHERE o.order_status <> 'delivered' GROUP BY 1","SELECT os.order_status, COUNT(DISTINCT f.order_id), ROUND(SUM(f.price), 2) FROM fact_sales f
+JOIN dim_order_status os ON os.order_status_key = f.order_status_key WHERE os.order_status <> 'delivered' GROUP BY 1","SELECT os.order_status, COUNT(DISTINCT f.order_id), ROUND(SUM(f.price), 2) FROM fact_sales f
+JOIN dim_order_status os ON os.order_status_key = f.order_status_key WHERE os.order_status <> 'delivered' GROUP BY 1",tidak,5,
+Q062,L3,"penjual,waktu",tidak,Penjual mana saja yang menjual lebih dari 1.000 item pada tahun 2017? Tampilkan ID penjual dan jumlah itemnya.,"SELECT oi.seller_id, COUNT(*) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN sellers se ON se.seller_id = oi.seller_id WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2017 GROUP BY 1 HAVING COUNT(*) > 1000","SELECT s.seller_id, COUNT(*) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_seller s ON s.seller_key = f.seller_key WHERE d.year = 2017 GROUP BY 1 HAVING COUNT(*) > 1000","SELECT s.seller_id, COUNT(*) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+JOIN dim_seller s ON s.seller_key = f.seller_key
+JOIN dim_city sci ON sci.city_key = s.city_key
+JOIN dim_state sst ON sst.state_key = sci.state_key WHERE dm.year_key = 2017 GROUP BY 1 HAVING COUNT(*) > 1000",tidak,3,
+Q063,L3,waktu,tidak,"Untuk setiap bulan pada tahun 2018, tampilkan nomor bulan, jumlah pesanan yang dibuat pada akhir pekan, dan jumlah pesanan yang dibuat pada hari kerja.","SELECT EXTRACT(MONTH FROM o.order_purchase_timestamp)::int, COUNT(DISTINCT CASE WHEN (EXTRACT(ISODOW FROM o.order_purchase_timestamp) IN (6, 7)) THEN oi.order_id END), COUNT(DISTINCT CASE WHEN NOT (EXTRACT(ISODOW FROM o.order_purchase_timestamp) IN (6, 7)) THEN oi.order_id END) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2018 GROUP BY 1 ORDER BY 1","SELECT d.month, COUNT(DISTINCT CASE WHEN d.is_weekend THEN f.order_id END), COUNT(DISTINCT CASE WHEN NOT d.is_weekend THEN f.order_id END) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key WHERE d.year = 2018 GROUP BY 1 ORDER BY 1","SELECT dm.month, COUNT(DISTINCT CASE WHEN d.is_weekend THEN f.order_id END), COUNT(DISTINCT CASE WHEN NOT d.is_weekend THEN f.order_id END) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key WHERE dm.year_key = 2018 GROUP BY 1 ORDER BY 1",ya,8,
+Q064,L3,produk,tidak,"Di antara kategori yang memiliki minimal 1.000 item terjual, sebutkan 5 kategori dengan rata-rata harga barang per item termurah beserta rata-ratanya.","SELECT t.product_category_name_english, ROUND(AVG(oi.price), 2) AS r FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN products pr ON pr.product_id = oi.product_id
+JOIN product_category_name_translation t ON t.product_category_name = pr.product_category_name GROUP BY 1 HAVING COUNT(*) >= 1000 ORDER BY r ASC LIMIT 5","SELECT p.category_name, ROUND(AVG(f.price), 2) AS r FROM fact_sales f
+JOIN dim_product p ON p.product_key = f.product_key GROUP BY 1 HAVING COUNT(*) >= 1000 ORDER BY r ASC LIMIT 5","SELECT k.category_name, ROUND(AVG(f.price), 2) AS r FROM fact_sales f
+JOIN dim_product p ON p.product_key = f.product_key
+JOIN dim_category k ON k.category_key = p.category_key GROUP BY 1 HAVING COUNT(*) >= 1000 ORDER BY r ASC LIMIT 5",ya,5,
+Q065,L3,"pelanggan,pengiriman",tidak,"Negara bagian pelanggan mana saja yang rata-rata ongkos kirim per itemnya di atas 30 BRL? Tampilkan kode negara bagian dan rata-ratanya, urutkan dari termahal.","SELECT cu.customer_state, ROUND(AVG(oi.freight_value), 2) AS r FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN customers cu ON cu.customer_id = o.customer_id GROUP BY 1 HAVING AVG(oi.freight_value) > 30 ORDER BY r DESC","SELECT c.state, ROUND(AVG(f.freight_value), 2) AS r FROM fact_sales f
+JOIN dim_customer c ON c.customer_key = f.customer_key GROUP BY 1 HAVING AVG(f.freight_value) > 30 ORDER BY r DESC","SELECT cst.state_code, ROUND(AVG(f.freight_value), 2) AS r FROM fact_sales f
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_city cci ON cci.city_key = c.city_key
+JOIN dim_state cst ON cst.state_key = cci.state_key GROUP BY 1 HAVING AVG(f.freight_value) > 30 ORDER BY r DESC",ya,15,
+Q066,L3,"pengiriman,pelanggan",ya,"Sebutkan 5 negara bagian pelanggan dengan jumlah pesanan yang lama pengirimannya lebih dari 30 hari terbanyak, beserta jumlah pesanannya.","SELECT cu.customer_state, COUNT(DISTINCT oi.order_id) AS n FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN customers cu ON cu.customer_id = o.customer_id WHERE o.order_delivered_customer_date::date - o.order_purchase_timestamp::date > 30 GROUP BY 1 ORDER BY n DESC LIMIT 5","SELECT c.state, COUNT(DISTINCT f.order_id) AS n FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+LEFT JOIN dim_date dd ON dd.date_key = f.delivered_customer_date_key
+JOIN dim_customer c ON c.customer_key = f.customer_key WHERE dd.full_date - d.full_date > 30 GROUP BY 1 ORDER BY n DESC LIMIT 5","SELECT cst.state_code, COUNT(DISTINCT f.order_id) AS n FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+LEFT JOIN dim_date dd ON dd.date_key = f.delivered_customer_date_key
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_city cci ON cci.city_key = c.city_key
+JOIN dim_state cst ON cst.state_key = cci.state_key WHERE dd.full_date - d.full_date > 30 GROUP BY 1 ORDER BY n DESC LIMIT 5",ya,5,
+Q067,L3,"pelanggan,produk",ya,"Untuk kategori elektronik, sebutkan 5 negara bagian pelanggan dengan jumlah pelanggan unik terbanyak beserta jumlah pelanggannya.","SELECT cu.customer_state, COUNT(DISTINCT cu.customer_unique_id) AS n FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN customers cu ON cu.customer_id = o.customer_id
+JOIN products pr ON pr.product_id = oi.product_id
+JOIN product_category_name_translation t ON t.product_category_name = pr.product_category_name WHERE t.product_category_name_english = 'electronics' GROUP BY 1 ORDER BY n DESC LIMIT 5","SELECT c.state, COUNT(DISTINCT c.customer_unique_id) AS n FROM fact_sales f
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_product p ON p.product_key = f.product_key WHERE p.category_name = 'electronics' GROUP BY 1 ORDER BY n DESC LIMIT 5","SELECT cst.state_code, COUNT(DISTINCT c.customer_unique_id) AS n FROM fact_sales f
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_city cci ON cci.city_key = c.city_key
+JOIN dim_state cst ON cst.state_key = cci.state_key
+JOIN dim_product p ON p.product_key = f.product_key
+JOIN dim_category k ON k.category_key = p.category_key WHERE k.category_name = 'electronics' GROUP BY 1 ORDER BY n DESC LIMIT 5",ya,5,
+Q068,L3,"produk,pengiriman",tidak,"Di antara kategori yang memiliki minimal 500 item terjual, sebutkan 5 kategori dengan persentase total ongkos kirim terhadap total harga barang tertinggi beserta persentasenya.","SELECT t.product_category_name_english, ROUND(100 * SUM(oi.freight_value) / SUM(oi.price), 2) AS pct FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN products pr ON pr.product_id = oi.product_id
+JOIN product_category_name_translation t ON t.product_category_name = pr.product_category_name GROUP BY 1 HAVING COUNT(*) >= 500 ORDER BY pct DESC LIMIT 5","SELECT p.category_name, ROUND(100 * SUM(f.freight_value) / SUM(f.price), 2) AS pct FROM fact_sales f
+JOIN dim_product p ON p.product_key = f.product_key GROUP BY 1 HAVING COUNT(*) >= 500 ORDER BY pct DESC LIMIT 5","SELECT k.category_name, ROUND(100 * SUM(f.freight_value) / SUM(f.price), 2) AS pct FROM fact_sales f
+JOIN dim_product p ON p.product_key = f.product_key
+JOIN dim_category k ON k.category_key = p.category_key GROUP BY 1 HAVING COUNT(*) >= 500 ORDER BY pct DESC LIMIT 5",ya,5,
+Q069,L3,waktu,tidak,"Untuk setiap tahun, berapa jumlah pesanan yang berisi lebih dari satu item? Tampilkan tahun dan jumlah pesanannya.","SELECT yr, COUNT(*) FROM (SELECT oi.order_id, EXTRACT(YEAR FROM o.order_purchase_timestamp)::int AS yr FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id GROUP BY 1, 2 HAVING COUNT(*) > 1) x GROUP BY 1 ORDER BY 1","SELECT yr, COUNT(*) FROM (SELECT f.order_id, d.year AS yr FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key GROUP BY 1, 2 HAVING COUNT(*) > 1) x GROUP BY 1 ORDER BY 1","SELECT yr, COUNT(*) FROM (SELECT f.order_id, dm.year_key AS yr FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key GROUP BY 1, 2 HAVING COUNT(*) > 1) x GROUP BY 1 ORDER BY 1",ya,2,
+Q070,L3,penjual,ya,"Penjual dari luar negara bagian SP mana saja yang omzetnya lebih dari 50.000 BRL? Tampilkan ID penjual, negara bagiannya, dan omzetnya.","SELECT oi.seller_id, se.seller_state, ROUND(SUM((oi.price + oi.freight_value)), 2) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN sellers se ON se.seller_id = oi.seller_id WHERE se.seller_state <> 'SP' GROUP BY 1, 2 HAVING SUM((oi.price + oi.freight_value)) > 50000","SELECT s.seller_id, s.state, ROUND(SUM(f.total_value), 2) FROM fact_sales f
+JOIN dim_seller s ON s.seller_key = f.seller_key WHERE s.state <> 'SP' GROUP BY 1, 2 HAVING SUM(f.total_value) > 50000","SELECT s.seller_id, sst.state_code, ROUND(SUM(f.total_value), 2) FROM fact_sales f
+JOIN dim_seller s ON s.seller_key = f.seller_key
+JOIN dim_city sci ON sci.city_key = s.city_key
+JOIN dim_state sst ON sst.state_key = sci.state_key WHERE sst.state_code <> 'SP' GROUP BY 1, 2 HAVING SUM(f.total_value) > 50000",tidak,13,
+Q071,L3,"pengiriman,waktu",ya,"Untuk pesanan yang dibeli pada Januari sampai Agustus 2018 dan sudah diterima, tampilkan nomor bulan pembelian dan rata-rata lama pengirimannya dalam hari.","SELECT mo, ROUND(AVG(lama), 2) FROM (SELECT DISTINCT oi.order_id AS oid, EXTRACT(MONTH FROM o.order_purchase_timestamp)::int AS mo, o.order_delivered_customer_date::date - o.order_purchase_timestamp::date AS lama FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2018 AND o.order_delivered_customer_date::date IS NOT NULL) x GROUP BY 1 ORDER BY 1","SELECT mo, ROUND(AVG(lama), 2) FROM (SELECT DISTINCT f.order_id AS oid, d.month AS mo, dd.full_date - d.full_date AS lama FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+LEFT JOIN dim_date dd ON dd.date_key = f.delivered_customer_date_key WHERE d.year = 2018 AND dd.full_date IS NOT NULL) x GROUP BY 1 ORDER BY 1","SELECT mo, ROUND(AVG(lama), 2) FROM (SELECT DISTINCT f.order_id AS oid, dm.month AS mo, dd.full_date - d.full_date AS lama FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+LEFT JOIN dim_date dd ON dd.date_key = f.delivered_customer_date_key WHERE dm.year_key = 2018 AND dd.full_date IS NOT NULL) x GROUP BY 1 ORDER BY 1",ya,8,
+Q072,L3,penjual,tidak,"Kota penjual mana saja yang memiliki minimal 50 penjual berbeda? Tampilkan nama kota dan jumlah penjualnya, urutkan dari terbanyak.","SELECT se.seller_city, COUNT(DISTINCT oi.seller_id) AS n FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN sellers se ON se.seller_id = oi.seller_id GROUP BY 1 HAVING COUNT(DISTINCT oi.seller_id) >= 50 ORDER BY n DESC","SELECT s.city, COUNT(DISTINCT s.seller_id) AS n FROM fact_sales f
+JOIN dim_seller s ON s.seller_key = f.seller_key GROUP BY 1 HAVING COUNT(DISTINCT s.seller_id) >= 50 ORDER BY n DESC","SELECT sci.city_name, COUNT(DISTINCT s.seller_id) AS n FROM fact_sales f
+JOIN dim_seller s ON s.seller_key = f.seller_key
+JOIN dim_city sci ON sci.city_key = s.city_key
+JOIN dim_state sst ON sst.state_key = sci.state_key GROUP BY 1 HAVING COUNT(DISTINCT s.seller_id) >= 50 ORDER BY n DESC",ya,6,
+Q073,L3,"produk,status",tidak,Kategori produk mana saja yang memiliki lebih dari 20 item dari pesanan yang dibatalkan? Tampilkan kategori dan jumlah itemnya.,"SELECT t.product_category_name_english, COUNT(*) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN products pr ON pr.product_id = oi.product_id
+JOIN product_category_name_translation t ON t.product_category_name = pr.product_category_name WHERE o.order_status = 'canceled' GROUP BY 1 HAVING COUNT(*) > 20","SELECT p.category_name, COUNT(*) FROM fact_sales f
+JOIN dim_product p ON p.product_key = f.product_key
+JOIN dim_order_status os ON os.order_status_key = f.order_status_key WHERE os.order_status = 'canceled' GROUP BY 1 HAVING COUNT(*) > 20","SELECT k.category_name, COUNT(*) FROM fact_sales f
+JOIN dim_product p ON p.product_key = f.product_key
+JOIN dim_category k ON k.category_key = p.category_key
+JOIN dim_order_status os ON os.order_status_key = f.order_status_key WHERE os.order_status = 'canceled' GROUP BY 1 HAVING COUNT(*) > 20",tidak,8,
+Q074,L3,"pelanggan,waktu",ya,"Untuk pelanggan dari negara bagian Bahia, tampilkan tahun, jumlah pesanan, dan omzet per tahun.","SELECT EXTRACT(YEAR FROM o.order_purchase_timestamp)::int, COUNT(DISTINCT oi.order_id), ROUND(SUM((oi.price + oi.freight_value)), 2) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN customers cu ON cu.customer_id = o.customer_id WHERE cu.customer_state = 'BA' GROUP BY 1 ORDER BY 1","SELECT d.year, COUNT(DISTINCT f.order_id), ROUND(SUM(f.total_value), 2) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_customer c ON c.customer_key = f.customer_key WHERE c.state = 'BA' GROUP BY 1 ORDER BY 1","SELECT dm.year_key, COUNT(DISTINCT f.order_id), ROUND(SUM(f.total_value), 2) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_city cci ON cci.city_key = c.city_key
+JOIN dim_state cst ON cst.state_key = cci.state_key WHERE cst.state_code = 'BA' GROUP BY 1 ORDER BY 1",ya,2,
+Q075,L3,produk,tidak,"Di antara kategori yang memiliki minimal 100 item terjual, sebutkan 5 kategori dengan rata-rata berat produk per item terberat beserta rata-ratanya dalam gram.","SELECT t.product_category_name_english, ROUND(AVG(pr.product_weight_g), 2) AS r FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN products pr ON pr.product_id = oi.product_id
+JOIN product_category_name_translation t ON t.product_category_name = pr.product_category_name GROUP BY 1 HAVING COUNT(*) >= 100 ORDER BY r DESC LIMIT 5","SELECT p.category_name, ROUND(AVG(p.weight_g), 2) AS r FROM fact_sales f
+JOIN dim_product p ON p.product_key = f.product_key GROUP BY 1 HAVING COUNT(*) >= 100 ORDER BY r DESC LIMIT 5","SELECT k.category_name, ROUND(AVG(p.weight_g), 2) AS r FROM fact_sales f
+JOIN dim_product p ON p.product_key = f.product_key
+JOIN dim_category k ON k.category_key = p.category_key GROUP BY 1 HAVING COUNT(*) >= 100 ORDER BY r DESC LIMIT 5",ya,5,
+Q076,L4,waktu,ya,"Untuk setiap bulan Januari sampai Agustus 2018, berapa persen pertumbuhan omzet dibanding bulan yang sama tahun 2017? Tampilkan nomor bulan dan persentase pertumbuhannya.","WITH b AS (SELECT EXTRACT(YEAR FROM o.order_purchase_timestamp)::int AS yr, EXTRACT(MONTH FROM o.order_purchase_timestamp)::int AS mo, SUM((oi.price + oi.freight_value)) AS x FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id GROUP BY 1, 2) SELECT b18.mo, ROUND(100 * (b18.x - b17.x) / b17.x, 2) FROM b b18 JOIN b b17 ON b17.mo = b18.mo AND b17.yr = 2017 WHERE b18.yr = 2018 ORDER BY 1","WITH b AS (SELECT d.year AS yr, d.month AS mo, SUM(f.total_value) AS x FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key GROUP BY 1, 2) SELECT b18.mo, ROUND(100 * (b18.x - b17.x) / b17.x, 2) FROM b b18 JOIN b b17 ON b17.mo = b18.mo AND b17.yr = 2017 WHERE b18.yr = 2018 ORDER BY 1","WITH b AS (SELECT dm.year_key AS yr, dm.month AS mo, SUM(f.total_value) AS x FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key GROUP BY 1, 2) SELECT b18.mo, ROUND(100 * (b18.x - b17.x) / b17.x, 2) FROM b b18 JOIN b b17 ON b17.mo = b18.mo AND b17.yr = 2017 WHERE b18.yr = 2018 ORDER BY 1",ya,8,
+Q077,L4,"pelanggan,produk",tidak,"Untuk masing-masing negara bagian pelanggan SP, RJ, dan MG, kategori produk apa yang jumlah item terjualnya paling banyak? Tampilkan negara bagian, kategori, dan jumlah itemnya.","WITH x AS (SELECT cu.customer_state AS st, t.product_category_name_english AS kat, COUNT(*) AS n FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN customers cu ON cu.customer_id = o.customer_id
+JOIN products pr ON pr.product_id = oi.product_id
+JOIN product_category_name_translation t ON t.product_category_name = pr.product_category_name WHERE cu.customer_state IN ('SP', 'RJ', 'MG') GROUP BY 1, 2), r AS (SELECT *, RANK() OVER (PARTITION BY st ORDER BY n DESC) AS rk FROM x) SELECT st, kat, n FROM r WHERE rk = 1","WITH x AS (SELECT c.state AS st, p.category_name AS kat, COUNT(*) AS n FROM fact_sales f
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_product p ON p.product_key = f.product_key WHERE c.state IN ('SP', 'RJ', 'MG') GROUP BY 1, 2), r AS (SELECT *, RANK() OVER (PARTITION BY st ORDER BY n DESC) AS rk FROM x) SELECT st, kat, n FROM r WHERE rk = 1","WITH x AS (SELECT cst.state_code AS st, k.category_name AS kat, COUNT(*) AS n FROM fact_sales f
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_city cci ON cci.city_key = c.city_key
+JOIN dim_state cst ON cst.state_key = cci.state_key
+JOIN dim_product p ON p.product_key = f.product_key
+JOIN dim_category k ON k.category_key = p.category_key WHERE cst.state_code IN ('SP', 'RJ', 'MG') GROUP BY 1, 2), r AS (SELECT *, RANK() OVER (PARTITION BY st ORDER BY n DESC) AS rk FROM x) SELECT st, kat, n FROM r WHERE rk = 1",tidak,3,
+Q078,L4,"produk,waktu",ya,"Sebutkan 5 kategori produk dengan kontribusi omzet terbesar pada tahun 2017, beserta persentase kontribusinya terhadap total omzet tahun 2017.","SELECT t.product_category_name_english, ROUND(100 * SUM((oi.price + oi.freight_value)) / SUM(SUM((oi.price + oi.freight_value))) OVER (), 2) AS pct FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN products pr ON pr.product_id = oi.product_id
+JOIN product_category_name_translation t ON t.product_category_name = pr.product_category_name WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2017 GROUP BY 1 ORDER BY pct DESC LIMIT 5","SELECT p.category_name, ROUND(100 * SUM(f.total_value) / SUM(SUM(f.total_value)) OVER (), 2) AS pct FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_product p ON p.product_key = f.product_key WHERE d.year = 2017 GROUP BY 1 ORDER BY pct DESC LIMIT 5","SELECT k.category_name, ROUND(100 * SUM(f.total_value) / SUM(SUM(f.total_value)) OVER (), 2) AS pct FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+JOIN dim_product p ON p.product_key = f.product_key
+JOIN dim_category k ON k.category_key = p.category_key WHERE dm.year_key = 2017 GROUP BY 1 ORDER BY pct DESC LIMIT 5",ya,5,
+Q079,L4,waktu,ya,Tampilkan nomor bulan dan omzet kumulatif (berjalan) dari awal tahun sampai bulan tersebut untuk setiap bulan pada tahun 2017.,"SELECT mo, ROUND(SUM(x) OVER (ORDER BY mo), 2) FROM (SELECT EXTRACT(MONTH FROM o.order_purchase_timestamp)::int AS mo, SUM((oi.price + oi.freight_value)) AS x FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2017 GROUP BY 1) b ORDER BY 1","SELECT mo, ROUND(SUM(x) OVER (ORDER BY mo), 2) FROM (SELECT d.month AS mo, SUM(f.total_value) AS x FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key WHERE d.year = 2017 GROUP BY 1) b ORDER BY 1","SELECT mo, ROUND(SUM(x) OVER (ORDER BY mo), 2) FROM (SELECT dm.month AS mo, SUM(f.total_value) AS x FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key WHERE dm.year_key = 2017 GROUP BY 1) b ORDER BY 1",ya,12,
+Q080,L4,"pengiriman,waktu",ya,"Bandingkan rata-rata lama pengiriman (hari) antara pesanan yang dibeli pada akhir pekan dan pada hari kerja, untuk pesanan yang sudah diterima. Tampilkan penanda akhir pekan (benar/salah) dan rata-ratanya.","SELECT wk, ROUND(AVG(lama), 2) FROM (SELECT DISTINCT oi.order_id AS oid, (EXTRACT(ISODOW FROM o.order_purchase_timestamp) IN (6, 7)) AS wk, o.order_delivered_customer_date::date - o.order_purchase_timestamp::date AS lama FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id WHERE o.order_delivered_customer_date::date IS NOT NULL) x GROUP BY 1","SELECT wk, ROUND(AVG(lama), 2) FROM (SELECT DISTINCT f.order_id AS oid, d.is_weekend AS wk, dd.full_date - d.full_date AS lama FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+LEFT JOIN dim_date dd ON dd.date_key = f.delivered_customer_date_key WHERE dd.full_date IS NOT NULL) x GROUP BY 1","SELECT wk, ROUND(AVG(lama), 2) FROM (SELECT DISTINCT f.order_id AS oid, d.is_weekend AS wk, dd.full_date - d.full_date AS lama FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+LEFT JOIN dim_date dd ON dd.date_key = f.delivered_customer_date_key WHERE dd.full_date IS NOT NULL) x GROUP BY 1",tidak,2,
+Q081,L4,"penjual,waktu",tidak,"Berapa jumlah penjual yang menjual barang pada tahun 2017 dan 2018, dan total harga barang yang dijualnya pada tahun 2018 lebih besar daripada pada tahun 2017?","WITH s AS (SELECT oi.seller_id AS sid, SUM(CASE WHEN EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2017 THEN oi.price ELSE 0 END) AS a, SUM(CASE WHEN EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2018 THEN oi.price ELSE 0 END) AS b, COUNT(DISTINCT EXTRACT(YEAR FROM o.order_purchase_timestamp)::int) AS ny FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN sellers se ON se.seller_id = oi.seller_id GROUP BY 1) SELECT COUNT(*) FROM s WHERE ny = 2 AND b > a","WITH s AS (SELECT s.seller_id AS sid, SUM(CASE WHEN d.year = 2017 THEN f.price ELSE 0 END) AS a, SUM(CASE WHEN d.year = 2018 THEN f.price ELSE 0 END) AS b, COUNT(DISTINCT d.year) AS ny FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_seller s ON s.seller_key = f.seller_key GROUP BY 1) SELECT COUNT(*) FROM s WHERE ny = 2 AND b > a","WITH s AS (SELECT s.seller_id AS sid, SUM(CASE WHEN dm.year_key = 2017 THEN f.price ELSE 0 END) AS a, SUM(CASE WHEN dm.year_key = 2018 THEN f.price ELSE 0 END) AS b, COUNT(DISTINCT dm.year_key) AS ny FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+JOIN dim_seller s ON s.seller_key = f.seller_key
+JOIN dim_city sci ON sci.city_key = s.city_key
+JOIN dim_state sst ON sst.state_key = sci.state_key GROUP BY 1) SELECT COUNT(*) FROM s WHERE ny = 2 AND b > a",tidak,1,
+Q082,L4,pelanggan,ya,Berapa jumlah pelanggan unik yang pernah melakukan lebih dari satu pesanan?,"SELECT COUNT(*) FROM (SELECT cu.customer_unique_id FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN customers cu ON cu.customer_id = o.customer_id GROUP BY 1 HAVING COUNT(DISTINCT oi.order_id) > 1) x","SELECT COUNT(*) FROM (SELECT c.customer_unique_id FROM fact_sales f
+JOIN dim_customer c ON c.customer_key = f.customer_key GROUP BY 1 HAVING COUNT(DISTINCT f.order_id) > 1) x","SELECT COUNT(*) FROM (SELECT c.customer_unique_id FROM fact_sales f
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_city cci ON cci.city_key = c.city_key
+JOIN dim_state cst ON cst.state_key = cci.state_key GROUP BY 1 HAVING COUNT(DISTINCT f.order_id) > 1) x",tidak,1,
+Q083,L4,waktu,ya,"Untuk setiap tahun, bulan apa yang memiliki omzet tertinggi? Tampilkan tahun, nomor bulan, dan omzetnya.","WITH b AS (SELECT EXTRACT(YEAR FROM o.order_purchase_timestamp)::int AS yr, EXTRACT(MONTH FROM o.order_purchase_timestamp)::int AS mo, SUM((oi.price + oi.freight_value)) AS x FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id GROUP BY 1, 2), r AS (SELECT *, RANK() OVER (PARTITION BY yr ORDER BY x DESC) AS rk FROM b) SELECT yr, mo, ROUND(x, 2) FROM r WHERE rk = 1 ORDER BY yr","WITH b AS (SELECT d.year AS yr, d.month AS mo, SUM(f.total_value) AS x FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key GROUP BY 1, 2), r AS (SELECT *, RANK() OVER (PARTITION BY yr ORDER BY x DESC) AS rk FROM b) SELECT yr, mo, ROUND(x, 2) FROM r WHERE rk = 1 ORDER BY yr","WITH b AS (SELECT dm.year_key AS yr, dm.month AS mo, SUM(f.total_value) AS x FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key GROUP BY 1, 2), r AS (SELECT *, RANK() OVER (PARTITION BY yr ORDER BY x DESC) AS rk FROM b) SELECT yr, mo, ROUND(x, 2) FROM r WHERE rk = 1 ORDER BY yr",ya,2,
+Q084,L4,"produk,waktu",tidak,"Di antara kategori yang menjual minimal 100 item pada kuartal pertama 2017, sebutkan 5 kategori dengan pertumbuhan jumlah item terbesar dari kuartal pertama 2017 ke kuartal pertama 2018, beserta persentase pertumbuhannya.","WITH b AS (SELECT t.product_category_name_english AS kat, SUM(CASE WHEN EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2017 AND EXTRACT(QUARTER FROM o.order_purchase_timestamp)::int = 1 THEN 1 ELSE 0 END) AS a, SUM(CASE WHEN EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2018 AND EXTRACT(QUARTER FROM o.order_purchase_timestamp)::int = 1 THEN 1 ELSE 0 END) AS b FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN products pr ON pr.product_id = oi.product_id
+JOIN product_category_name_translation t ON t.product_category_name = pr.product_category_name GROUP BY 1) SELECT kat, ROUND(100.0 * (b - a) / a, 2) AS g FROM b WHERE a >= 100 ORDER BY g DESC LIMIT 5","WITH b AS (SELECT p.category_name AS kat, SUM(CASE WHEN d.year = 2017 AND d.quarter = 1 THEN 1 ELSE 0 END) AS a, SUM(CASE WHEN d.year = 2018 AND d.quarter = 1 THEN 1 ELSE 0 END) AS b FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_product p ON p.product_key = f.product_key GROUP BY 1) SELECT kat, ROUND(100.0 * (b - a) / a, 2) AS g FROM b WHERE a >= 100 ORDER BY g DESC LIMIT 5","WITH b AS (SELECT k.category_name AS kat, SUM(CASE WHEN dm.year_key = 2017 AND dm.quarter = 1 THEN 1 ELSE 0 END) AS a, SUM(CASE WHEN dm.year_key = 2018 AND dm.quarter = 1 THEN 1 ELSE 0 END) AS b FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+JOIN dim_product p ON p.product_key = f.product_key
+JOIN dim_category k ON k.category_key = p.category_key GROUP BY 1) SELECT kat, ROUND(100.0 * (b - a) / a, 2) AS g FROM b WHERE a >= 100 ORDER BY g DESC LIMIT 5",ya,5,
+Q085,L4,"pengiriman,pelanggan",ya,"Di antara negara bagian pelanggan yang memiliki minimal 1.000 pesanan yang sudah diterima, sebutkan 5 negara bagian dengan persentase pesanan terlambat tertinggi beserta persentasenya.","SELECT st, ROUND(100.0 * SUM(CASE WHEN tl THEN 1 ELSE 0 END) / COUNT(*), 2) AS pct FROM (SELECT DISTINCT oi.order_id AS oid, cu.customer_state AS st, (o.order_delivered_customer_date::date > o.order_estimated_delivery_date::date) AS tl FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN customers cu ON cu.customer_id = o.customer_id WHERE o.order_delivered_customer_date::date IS NOT NULL) x GROUP BY 1 HAVING COUNT(*) >= 1000 ORDER BY pct DESC LIMIT 5","SELECT st, ROUND(100.0 * SUM(CASE WHEN tl THEN 1 ELSE 0 END) / COUNT(*), 2) AS pct FROM (SELECT DISTINCT f.order_id AS oid, c.state AS st, (dd.full_date > de.full_date) AS tl FROM fact_sales f
+LEFT JOIN dim_date dd ON dd.date_key = f.delivered_customer_date_key
+JOIN dim_date de ON de.date_key = f.estimated_delivery_date_key
+JOIN dim_customer c ON c.customer_key = f.customer_key WHERE dd.full_date IS NOT NULL) x GROUP BY 1 HAVING COUNT(*) >= 1000 ORDER BY pct DESC LIMIT 5","SELECT st, ROUND(100.0 * SUM(CASE WHEN tl THEN 1 ELSE 0 END) / COUNT(*), 2) AS pct FROM (SELECT DISTINCT f.order_id AS oid, cst.state_code AS st, (dd.full_date > de.full_date) AS tl FROM fact_sales f
+LEFT JOIN dim_date dd ON dd.date_key = f.delivered_customer_date_key
+JOIN dim_date de ON de.date_key = f.estimated_delivery_date_key
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_city cci ON cci.city_key = c.city_key
+JOIN dim_state cst ON cst.state_key = cci.state_key WHERE dd.full_date IS NOT NULL) x GROUP BY 1 HAVING COUNT(*) >= 1000 ORDER BY pct DESC LIMIT 5",ya,5,
+Q086,L4,"penjual,waktu",tidak,"Untuk masing-masing negara bagian penjual SP, RJ, dan MG, sebutkan 3 penjual dengan jumlah item terjual terbanyak pada tahun 2018. Tampilkan negara bagian, ID penjual, dan jumlah itemnya.","WITH x AS (SELECT se.seller_state AS st, oi.seller_id AS sid, COUNT(*) AS n FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN sellers se ON se.seller_id = oi.seller_id WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2018 AND se.seller_state IN ('SP', 'RJ', 'MG') GROUP BY 1, 2), r AS (SELECT *, RANK() OVER (PARTITION BY st ORDER BY n DESC) AS rk FROM x) SELECT st, sid, n FROM r WHERE rk <= 3","WITH x AS (SELECT s.state AS st, s.seller_id AS sid, COUNT(*) AS n FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_seller s ON s.seller_key = f.seller_key WHERE d.year = 2018 AND s.state IN ('SP', 'RJ', 'MG') GROUP BY 1, 2), r AS (SELECT *, RANK() OVER (PARTITION BY st ORDER BY n DESC) AS rk FROM x) SELECT st, sid, n FROM r WHERE rk <= 3","WITH x AS (SELECT sst.state_code AS st, s.seller_id AS sid, COUNT(*) AS n FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+JOIN dim_seller s ON s.seller_key = f.seller_key
+JOIN dim_city sci ON sci.city_key = s.city_key
+JOIN dim_state sst ON sst.state_key = sci.state_key WHERE dm.year_key = 2018 AND sst.state_code IN ('SP', 'RJ', 'MG') GROUP BY 1, 2), r AS (SELECT *, RANK() OVER (PARTITION BY st ORDER BY n DESC) AS rk FROM x) SELECT st, sid, n FROM r WHERE rk <= 3",tidak,9,
+Q087,L4,"pengiriman,waktu",tidak,"Untuk pesanan yang dibeli pada tahun 2018 dan sudah disetujui serta sudah diserahkan ke kurir, tampilkan nomor bulan pembelian dan rata-rata selisih hari antara tanggal persetujuan pembayaran dan tanggal penyerahan ke kurir.","SELECT mo, ROUND(AVG(sel), 2) FROM (SELECT DISTINCT oi.order_id AS oid, EXTRACT(MONTH FROM o.order_purchase_timestamp)::int AS mo, o.order_delivered_carrier_date::date - o.order_approved_at::date AS sel FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2018 AND o.order_approved_at::date IS NOT NULL AND o.order_delivered_carrier_date::date IS NOT NULL) x GROUP BY 1 ORDER BY 1","SELECT mo, ROUND(AVG(sel), 2) FROM (SELECT DISTINCT f.order_id AS oid, d.month AS mo, dc.full_date - da.full_date AS sel FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+LEFT JOIN dim_date da ON da.date_key = f.approved_date_key
+LEFT JOIN dim_date dc ON dc.date_key = f.delivered_carrier_date_key WHERE d.year = 2018 AND da.full_date IS NOT NULL AND dc.full_date IS NOT NULL) x GROUP BY 1 ORDER BY 1","SELECT mo, ROUND(AVG(sel), 2) FROM (SELECT DISTINCT f.order_id AS oid, dm.month AS mo, dc.full_date - da.full_date AS sel FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+LEFT JOIN dim_date da ON da.date_key = f.approved_date_key
+LEFT JOIN dim_date dc ON dc.date_key = f.delivered_carrier_date_key WHERE dm.year_key = 2018 AND da.full_date IS NOT NULL AND dc.full_date IS NOT NULL) x GROUP BY 1 ORDER BY 1",ya,8,
+Q088,L4,"pengiriman,waktu",tidak,"Untuk pesanan yang sudah diterima, rata-rata berapa hari lebih cepat barang tiba dibanding tanggal estimasinya, untuk setiap tahun pembelian? Tampilkan tahun dan rata-rata selisih harinya (estimasi dikurangi tanggal diterima).","SELECT yr, ROUND(AVG(sel), 2) FROM (SELECT DISTINCT oi.order_id AS oid, EXTRACT(YEAR FROM o.order_purchase_timestamp)::int AS yr, o.order_estimated_delivery_date::date - o.order_delivered_customer_date::date AS sel FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id WHERE o.order_delivered_customer_date::date IS NOT NULL) x GROUP BY 1 ORDER BY 1","SELECT yr, ROUND(AVG(sel), 2) FROM (SELECT DISTINCT f.order_id AS oid, d.year AS yr, de.full_date - dd.full_date AS sel FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+LEFT JOIN dim_date dd ON dd.date_key = f.delivered_customer_date_key
+JOIN dim_date de ON de.date_key = f.estimated_delivery_date_key WHERE dd.full_date IS NOT NULL) x GROUP BY 1 ORDER BY 1","SELECT yr, ROUND(AVG(sel), 2) FROM (SELECT DISTINCT f.order_id AS oid, dm.year_key AS yr, de.full_date - dd.full_date AS sel FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+LEFT JOIN dim_date dd ON dd.date_key = f.delivered_customer_date_key
+JOIN dim_date de ON de.date_key = f.estimated_delivery_date_key WHERE dd.full_date IS NOT NULL) x GROUP BY 1 ORDER BY 1",ya,2,
+Q089,L4,"pelanggan,penjual,waktu",ya,"Untuk setiap tahun, berapa persen omzet yang berasal dari item yang negara bagian pelanggannya berbeda dengan negara bagian penjualnya? Tampilkan tahun dan persentasenya.","SELECT EXTRACT(YEAR FROM o.order_purchase_timestamp)::int, ROUND(100 * SUM(CASE WHEN cu.customer_state <> se.seller_state THEN (oi.price + oi.freight_value) ELSE 0 END) / SUM((oi.price + oi.freight_value)), 2) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN customers cu ON cu.customer_id = o.customer_id
+JOIN sellers se ON se.seller_id = oi.seller_id GROUP BY 1 ORDER BY 1","SELECT d.year, ROUND(100 * SUM(CASE WHEN c.state <> s.state THEN f.total_value ELSE 0 END) / SUM(f.total_value), 2) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_seller s ON s.seller_key = f.seller_key GROUP BY 1 ORDER BY 1","SELECT dm.year_key, ROUND(100 * SUM(CASE WHEN cst.state_code <> sst.state_code THEN f.total_value ELSE 0 END) / SUM(f.total_value), 2) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_city cci ON cci.city_key = c.city_key
+JOIN dim_state cst ON cst.state_key = cci.state_key
+JOIN dim_seller s ON s.seller_key = f.seller_key
+JOIN dim_city sci ON sci.city_key = s.city_key
+JOIN dim_state sst ON sst.state_key = sci.state_key GROUP BY 1 ORDER BY 1",ya,2,
+Q090,L4,waktu,tidak,"Pada tahun 2017, hari apa dalam seminggu yang memiliki rata-rata jumlah pesanan harian tertinggi? Tampilkan nomor hari (1 = Senin sampai 7 = Minggu) dan rata-rata jumlah pesanan hariannya.","SELECT dw, ROUND(AVG(n), 2) AS r FROM (SELECT o.order_purchase_timestamp::date AS tgl, EXTRACT(ISODOW FROM o.order_purchase_timestamp)::int AS dw, COUNT(DISTINCT oi.order_id) AS n FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2017 GROUP BY 1, 2) x GROUP BY 1 ORDER BY r DESC LIMIT 1","SELECT dw, ROUND(AVG(n), 2) AS r FROM (SELECT d.full_date AS tgl, d.day_of_week AS dw, COUNT(DISTINCT f.order_id) AS n FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key WHERE d.year = 2017 GROUP BY 1, 2) x GROUP BY 1 ORDER BY r DESC LIMIT 1","SELECT dw, ROUND(AVG(n), 2) AS r FROM (SELECT d.full_date AS tgl, d.day_of_week AS dw, COUNT(DISTINCT f.order_id) AS n FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key WHERE dm.year_key = 2017 GROUP BY 1, 2) x GROUP BY 1 ORDER BY r DESC LIMIT 1",ya,1,
+Q091,L4,"produk,waktu",ya,"Untuk 5 kategori produk dengan omzet terbesar sepanjang data, tampilkan kategori, omzet tahun 2017, dan omzet tahun 2018 secara berdampingan.","WITH t AS (SELECT t.product_category_name_english AS kat FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN products pr ON pr.product_id = oi.product_id
+JOIN product_category_name_translation t ON t.product_category_name = pr.product_category_name GROUP BY 1 ORDER BY SUM((oi.price + oi.freight_value)) DESC LIMIT 5) SELECT t.product_category_name_english, ROUND(SUM(CASE WHEN EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2017 THEN (oi.price + oi.freight_value) ELSE 0 END), 2), ROUND(SUM(CASE WHEN EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2018 THEN (oi.price + oi.freight_value) ELSE 0 END), 2) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN products pr ON pr.product_id = oi.product_id
+JOIN product_category_name_translation t ON t.product_category_name = pr.product_category_name WHERE t.product_category_name_english IN (SELECT kat FROM t) GROUP BY 1","WITH t AS (SELECT p.category_name AS kat FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_product p ON p.product_key = f.product_key GROUP BY 1 ORDER BY SUM(f.total_value) DESC LIMIT 5) SELECT p.category_name, ROUND(SUM(CASE WHEN d.year = 2017 THEN f.total_value ELSE 0 END), 2), ROUND(SUM(CASE WHEN d.year = 2018 THEN f.total_value ELSE 0 END), 2) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_product p ON p.product_key = f.product_key WHERE p.category_name IN (SELECT kat FROM t) GROUP BY 1","WITH t AS (SELECT k.category_name AS kat FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+JOIN dim_product p ON p.product_key = f.product_key
+JOIN dim_category k ON k.category_key = p.category_key GROUP BY 1 ORDER BY SUM(f.total_value) DESC LIMIT 5) SELECT k.category_name, ROUND(SUM(CASE WHEN dm.year_key = 2017 THEN f.total_value ELSE 0 END), 2), ROUND(SUM(CASE WHEN dm.year_key = 2018 THEN f.total_value ELSE 0 END), 2) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+JOIN dim_product p ON p.product_key = f.product_key
+JOIN dim_category k ON k.category_key = p.category_key WHERE k.category_name IN (SELECT kat FROM t) GROUP BY 1",tidak,5,
+Q092,L4,pelanggan,ya,"Sebutkan 5 pelanggan unik dengan total belanja (omzet) terbesar, beserta total belanja dan jumlah pesanannya.","SELECT cu.customer_unique_id, ROUND(SUM((oi.price + oi.freight_value)), 2) AS x, COUNT(DISTINCT oi.order_id) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN customers cu ON cu.customer_id = o.customer_id GROUP BY 1 ORDER BY x DESC LIMIT 5","SELECT c.customer_unique_id, ROUND(SUM(f.total_value), 2) AS x, COUNT(DISTINCT f.order_id) FROM fact_sales f
+JOIN dim_customer c ON c.customer_key = f.customer_key GROUP BY 1 ORDER BY x DESC LIMIT 5","SELECT c.customer_unique_id, ROUND(SUM(f.total_value), 2) AS x, COUNT(DISTINCT f.order_id) FROM fact_sales f
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_city cci ON cci.city_key = c.city_key
+JOIN dim_state cst ON cst.state_key = cci.state_key GROUP BY 1 ORDER BY x DESC LIMIT 5",ya,5,
+Q093,L4,produk,tidak,"Di antara kategori yang memiliki minimal 1.000 item terjual, sebutkan 5 kategori dengan median harga barang per item tertinggi beserta mediannya.","SELECT t.product_category_name_english, ROUND((PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY oi.price))::numeric, 2) AS med FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN products pr ON pr.product_id = oi.product_id
+JOIN product_category_name_translation t ON t.product_category_name = pr.product_category_name GROUP BY 1 HAVING COUNT(*) >= 1000 ORDER BY med DESC LIMIT 5","SELECT p.category_name, ROUND((PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY f.price))::numeric, 2) AS med FROM fact_sales f
+JOIN dim_product p ON p.product_key = f.product_key GROUP BY 1 HAVING COUNT(*) >= 1000 ORDER BY med DESC LIMIT 5","SELECT k.category_name, ROUND((PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY f.price))::numeric, 2) AS med FROM fact_sales f
+JOIN dim_product p ON p.product_key = f.product_key
+JOIN dim_category k ON k.category_key = p.category_key GROUP BY 1 HAVING COUNT(*) >= 1000 ORDER BY med DESC LIMIT 5",ya,5,
+Q094,L4,pelanggan,tidak,"Di antara negara bagian pelanggan yang memiliki minimal 500 pesanan, sebutkan 5 negara bagian dengan persentase pesanan berisi lebih dari satu item tertinggi beserta persentasenya.","SELECT st, ROUND(100.0 * SUM(CASE WHEN n > 1 THEN 1 ELSE 0 END) / COUNT(*), 2) AS pct FROM (SELECT oi.order_id AS oid, cu.customer_state AS st, COUNT(*) AS n FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN customers cu ON cu.customer_id = o.customer_id GROUP BY 1, 2) x GROUP BY 1 HAVING COUNT(*) >= 500 ORDER BY pct DESC LIMIT 5","SELECT st, ROUND(100.0 * SUM(CASE WHEN n > 1 THEN 1 ELSE 0 END) / COUNT(*), 2) AS pct FROM (SELECT f.order_id AS oid, c.state AS st, COUNT(*) AS n FROM fact_sales f
+JOIN dim_customer c ON c.customer_key = f.customer_key GROUP BY 1, 2) x GROUP BY 1 HAVING COUNT(*) >= 500 ORDER BY pct DESC LIMIT 5","SELECT st, ROUND(100.0 * SUM(CASE WHEN n > 1 THEN 1 ELSE 0 END) / COUNT(*), 2) AS pct FROM (SELECT f.order_id AS oid, cst.state_code AS st, COUNT(*) AS n FROM fact_sales f
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_city cci ON cci.city_key = c.city_key
+JOIN dim_state cst ON cst.state_key = cci.state_key GROUP BY 1, 2) x GROUP BY 1 HAVING COUNT(*) >= 500 ORDER BY pct DESC LIMIT 5",ya,5,
+Q095,L4,"pelanggan,waktu",ya,"Berapa jumlah pelanggan baru setiap bulan pada tahun 2018, yaitu pelanggan unik yang pembelian pertamanya terjadi pada bulan tersebut? Tampilkan nomor bulan dan jumlahnya.","SELECT ym1 % 100 AS mo, COUNT(*) FROM (SELECT cu.customer_unique_id AS cid, MIN((EXTRACT(YEAR FROM o.order_purchase_timestamp)*100 + EXTRACT(MONTH FROM o.order_purchase_timestamp))::int) AS ym1 FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN customers cu ON cu.customer_id = o.customer_id GROUP BY 1) x WHERE ym1 / 100 = 2018 GROUP BY 1 ORDER BY 1","SELECT ym1 % 100 AS mo, COUNT(*) FROM (SELECT c.customer_unique_id AS cid, MIN((d.year*100+d.month)) AS ym1 FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_customer c ON c.customer_key = f.customer_key GROUP BY 1) x WHERE ym1 / 100 = 2018 GROUP BY 1 ORDER BY 1","SELECT ym1 % 100 AS mo, COUNT(*) FROM (SELECT c.customer_unique_id AS cid, MIN(dm.month_key) AS ym1 FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_city cci ON cci.city_key = c.city_key
+JOIN dim_state cst ON cst.state_key = cci.state_key GROUP BY 1) x WHERE ym1 / 100 = 2018 GROUP BY 1 ORDER BY 1",ya,8,
+Q096,L4,"produk,penjual",tidak,"Di antara kategori yang memiliki minimal 1.000 item terjual, sebutkan 5 kategori dengan persentase item dari penjual negara bagian SP tertinggi, beserta persentasenya.","SELECT t.product_category_name_english, ROUND(100.0 * SUM(CASE WHEN se.seller_state = 'SP' THEN 1 ELSE 0 END) / COUNT(*), 2) AS pct FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN sellers se ON se.seller_id = oi.seller_id
+JOIN products pr ON pr.product_id = oi.product_id
+JOIN product_category_name_translation t ON t.product_category_name = pr.product_category_name GROUP BY 1 HAVING COUNT(*) >= 1000 ORDER BY pct DESC LIMIT 5","SELECT p.category_name, ROUND(100.0 * SUM(CASE WHEN s.state = 'SP' THEN 1 ELSE 0 END) / COUNT(*), 2) AS pct FROM fact_sales f
+JOIN dim_seller s ON s.seller_key = f.seller_key
+JOIN dim_product p ON p.product_key = f.product_key GROUP BY 1 HAVING COUNT(*) >= 1000 ORDER BY pct DESC LIMIT 5","SELECT k.category_name, ROUND(100.0 * SUM(CASE WHEN sst.state_code = 'SP' THEN 1 ELSE 0 END) / COUNT(*), 2) AS pct FROM fact_sales f
+JOIN dim_seller s ON s.seller_key = f.seller_key
+JOIN dim_city sci ON sci.city_key = s.city_key
+JOIN dim_state sst ON sst.state_key = sci.state_key
+JOIN dim_product p ON p.product_key = f.product_key
+JOIN dim_category k ON k.category_key = p.category_key GROUP BY 1 HAVING COUNT(*) >= 1000 ORDER BY pct DESC LIMIT 5",ya,5,
+Q097,L4,waktu,ya,"Untuk setiap tahun, berapa jumlah pesanan yang nilai omzetnya di atas rata-rata omzet per pesanan seluruh data? Tampilkan tahun dan jumlah pesanannya.","WITH o AS (SELECT oi.order_id AS oid, EXTRACT(YEAR FROM o.order_purchase_timestamp)::int AS yr, SUM((oi.price + oi.freight_value)) AS x FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id GROUP BY 1, 2) SELECT yr, COUNT(*) FROM o WHERE x > (SELECT AVG(x) FROM o) GROUP BY 1 ORDER BY 1","WITH o AS (SELECT f.order_id AS oid, d.year AS yr, SUM(f.total_value) AS x FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key GROUP BY 1, 2) SELECT yr, COUNT(*) FROM o WHERE x > (SELECT AVG(x) FROM o) GROUP BY 1 ORDER BY 1","WITH o AS (SELECT f.order_id AS oid, dm.year_key AS yr, SUM(f.total_value) AS x FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key GROUP BY 1, 2) SELECT yr, COUNT(*) FROM o WHERE x > (SELECT AVG(x) FROM o) GROUP BY 1 ORDER BY 1",ya,2,
+Q098,L4,waktu,ya,"Untuk setiap bulan pada tahun 2018, tampilkan nomor bulan, omzet bulan itu, dan selisihnya dibanding omzet bulan sebelumnya (untuk Januari 2018 dibanding Desember 2017).","WITH b AS (SELECT (EXTRACT(YEAR FROM o.order_purchase_timestamp)*100 + EXTRACT(MONTH FROM o.order_purchase_timestamp))::int AS ym, SUM((oi.price + oi.freight_value)) AS x FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id GROUP BY 1), l AS (SELECT ym, x, x - LAG(x) OVER (ORDER BY ym) AS d FROM b) SELECT ym % 100, ROUND(x, 2), ROUND(d, 2) FROM l WHERE ym / 100 = 2018 ORDER BY ym","WITH b AS (SELECT (d.year*100+d.month) AS ym, SUM(f.total_value) AS x FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key GROUP BY 1), l AS (SELECT ym, x, x - LAG(x) OVER (ORDER BY ym) AS d FROM b) SELECT ym % 100, ROUND(x, 2), ROUND(d, 2) FROM l WHERE ym / 100 = 2018 ORDER BY ym","WITH b AS (SELECT dm.month_key AS ym, SUM(f.total_value) AS x FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key GROUP BY 1), l AS (SELECT ym, x, x - LAG(x) OVER (ORDER BY ym) AS d FROM b) SELECT ym % 100, ROUND(x, 2), ROUND(d, 2) FROM l WHERE ym / 100 = 2018 ORDER BY ym",ya,8,
+Q099,L4,"produk,pelanggan",tidak,Kategori produk mana saja yang pernah dibeli oleh pelanggan dari seluruh negara bagian yang ada dalam data? Tampilkan nama kategorinya.,"SELECT t.product_category_name_english FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN customers cu ON cu.customer_id = o.customer_id
+JOIN products pr ON pr.product_id = oi.product_id
+JOIN product_category_name_translation t ON t.product_category_name = pr.product_category_name GROUP BY 1 HAVING COUNT(DISTINCT cu.customer_state) = (SELECT COUNT(DISTINCT cu.customer_state) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN customers cu ON cu.customer_id = o.customer_id
+JOIN products pr ON pr.product_id = oi.product_id
+JOIN product_category_name_translation t ON t.product_category_name = pr.product_category_name)","SELECT p.category_name FROM fact_sales f
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_product p ON p.product_key = f.product_key GROUP BY 1 HAVING COUNT(DISTINCT c.state) = (SELECT COUNT(DISTINCT c.state) FROM fact_sales f
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_product p ON p.product_key = f.product_key)","SELECT k.category_name FROM fact_sales f
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_city cci ON cci.city_key = c.city_key
+JOIN dim_state cst ON cst.state_key = cci.state_key
+JOIN dim_product p ON p.product_key = f.product_key
+JOIN dim_category k ON k.category_key = p.category_key GROUP BY 1 HAVING COUNT(DISTINCT cst.state_code) = (SELECT COUNT(DISTINCT cst.state_code) FROM fact_sales f
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_city cci ON cci.city_key = c.city_key
+JOIN dim_state cst ON cst.state_key = cci.state_key
+JOIN dim_product p ON p.product_key = f.product_key
+JOIN dim_category k ON k.category_key = p.category_key)",tidak,12,
+Q100,L4,"pengiriman,pelanggan,penjual,waktu",ya,"Untuk setiap tahun pembelian, bandingkan rata-rata lama pengiriman (hari) pesanan yang sudah diterima antara item yang penjual dan pelanggannya berada di negara bagian yang sama dan yang berbeda. Tampilkan tahun, penanda negara bagian sama (benar/salah), dan rata-ratanya.","SELECT yr, sama, ROUND(AVG(lama), 2) FROM (SELECT EXTRACT(YEAR FROM o.order_purchase_timestamp)::int AS yr, (cu.customer_state = se.seller_state) AS sama, o.order_delivered_customer_date::date - o.order_purchase_timestamp::date AS lama FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN customers cu ON cu.customer_id = o.customer_id
+JOIN sellers se ON se.seller_id = oi.seller_id WHERE o.order_delivered_customer_date::date IS NOT NULL) x GROUP BY 1, 2 ORDER BY 1, 2","SELECT yr, sama, ROUND(AVG(lama), 2) FROM (SELECT d.year AS yr, (c.state = s.state) AS sama, dd.full_date - d.full_date AS lama FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+LEFT JOIN dim_date dd ON dd.date_key = f.delivered_customer_date_key
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_seller s ON s.seller_key = f.seller_key WHERE dd.full_date IS NOT NULL) x GROUP BY 1, 2 ORDER BY 1, 2","SELECT yr, sama, ROUND(AVG(lama), 2) FROM (SELECT dm.year_key AS yr, (cst.state_code = sst.state_code) AS sama, dd.full_date - d.full_date AS lama FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+LEFT JOIN dim_date dd ON dd.date_key = f.delivered_customer_date_key
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_city cci ON cci.city_key = c.city_key
+JOIN dim_state cst ON cst.state_key = cci.state_key
+JOIN dim_seller s ON s.seller_key = f.seller_key
+JOIN dim_city sci ON sci.city_key = s.city_key
+JOIN dim_state sst ON sst.state_key = sci.state_key WHERE dd.full_date IS NOT NULL) x GROUP BY 1, 2 ORDER BY 1, 2",ya,4,

@@ -20,6 +20,7 @@ Desain eksperimen faktorial 3 × 3, metrik utama *Execution Accuracy*.
 | `metadata/<skema>_M{0,1,2}.sql` | 9 teks metadata skema yang disisipkan ke prompt |
 | `buat_metadata.py` | Generator ke-9 file metadata (satu kamus deskripsi untuk semua skema) |
 | `docs/pedoman-metadata-soal.md` | Definisi M0/M1/M2, template prompt, pedoman 100 soal, aturan penilaian EX |
+| `soal/` | 100 soal + 300 SQL kunci + validasi otomatis (lihat `soal/README.md`) |
 | `contoh/contoh_soal.sql` | 4 contoh soal (L1–L4) dengan SQL kunci di 3 skema |
 | `cek_koneksi.py` | Cek kesiapan: `.env`, API key OpenRouter, koneksi DB read-only, 1 panggilan model |
 | `profil_dataset.py` | Profil/audit CSV dataset (DuckDB) |
@@ -48,6 +49,6 @@ python buat_metadata.py
 - [x] Build DW + 6/6 uji kesetaraan lulus
 - [x] User read-only + koneksi OpenRouter
 - [x] Metadata M0/M1/M2 (disetujui 18 Nov 2026)
-- [ ] 100 soal + 300 SQL kunci
+- [x] 100 soal + 300 SQL kunci (lolos validasi 100/100)
 - [ ] Skrip pilot & eksperimen
 - [ ] Analisis statistik
