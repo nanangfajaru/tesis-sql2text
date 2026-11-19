@@ -1,0 +1,227 @@
+run,waktu_utc,id,tingkat,butuh_glosarium,skema,metadata,model,penyedia,sql_model,status,benar,pesan_error,baris_model,baris_kunci,token_masuk,token_keluar,token_reasoning,biaya_usd,latensi_dtk
+pilot_dryrun,2026-11-19T07:43:37+00:00,Q004,L1,ya,oltp,M1,dry-run,dry-run,"SELECT ROUND(SUM((oi.price + oi.freight_value)), 2) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2018",benar,1,,1,1,,,0,,0.0
+pilot_dryrun,2026-11-19T07:43:37+00:00,Q004,L1,ya,oltp,M3,dry-run,dry-run,"SELECT ROUND(SUM((oi.price + oi.freight_value)), 2) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2018",benar,1,,1,1,,,0,,0.0
+pilot_dryrun,2026-11-19T07:43:37+00:00,Q004,L1,ya,star,M1,dry-run,dry-run,"SELECT ROUND(SUM(f.total_value), 2) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key WHERE d.year = 2018",benar,1,,1,1,,,0,,0.0
+pilot_dryrun,2026-11-19T07:43:37+00:00,Q004,L1,ya,star,M3,dry-run,dry-run,"SELECT ROUND(SUM(f.total_value), 2) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key WHERE d.year = 2018",benar,1,,1,1,,,0,,0.0
+pilot_dryrun,2026-11-19T07:43:38+00:00,Q004,L1,ya,snowflake,M1,dry-run,dry-run,"SELECT ROUND(SUM(f.total_value), 2) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key WHERE dm.year_key = 2018",benar,1,,1,1,,,0,,0.0
+pilot_dryrun,2026-11-19T07:43:38+00:00,Q004,L1,ya,snowflake,M3,dry-run,dry-run,"SELECT ROUND(SUM(f.total_value), 2) FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key WHERE dm.year_key = 2018",benar,1,,1,1,,,0,,0.0
+pilot_dryrun,2026-11-19T07:43:38+00:00,Q010,L1,tidak,oltp,M1,dry-run,dry-run,"SELECT COUNT(DISTINCT oi.order_id) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN customers cu ON cu.customer_id = o.customer_id WHERE cu.customer_state = 'RJ'",benar,1,,1,1,,,0,,0.0
+pilot_dryrun,2026-11-19T07:43:38+00:00,Q010,L1,tidak,oltp,M3,dry-run,dry-run,"SELECT COUNT(DISTINCT oi.order_id) FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN customers cu ON cu.customer_id = o.customer_id WHERE cu.customer_state = 'RJ'",benar,1,,1,1,,,0,,0.0
+pilot_dryrun,2026-11-19T07:43:38+00:00,Q010,L1,tidak,star,M1,dry-run,dry-run,"SELECT COUNT(DISTINCT f.order_id) FROM fact_sales f
+JOIN dim_customer c ON c.customer_key = f.customer_key WHERE c.state = 'RJ'",benar,1,,1,1,,,0,,0.0
+pilot_dryrun,2026-11-19T07:43:38+00:00,Q010,L1,tidak,star,M3,dry-run,dry-run,"SELECT COUNT(DISTINCT f.order_id) FROM fact_sales f
+JOIN dim_customer c ON c.customer_key = f.customer_key WHERE c.state = 'RJ'",benar,1,,1,1,,,0,,0.0
+pilot_dryrun,2026-11-19T07:43:38+00:00,Q010,L1,tidak,snowflake,M1,dry-run,dry-run,"SELECT COUNT(DISTINCT f.order_id) FROM fact_sales f
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_city cci ON cci.city_key = c.city_key
+JOIN dim_state cst ON cst.state_key = cci.state_key WHERE cst.state_code = 'RJ'",benar,1,,1,1,,,0,,0.0
+pilot_dryrun,2026-11-19T07:43:38+00:00,Q010,L1,tidak,snowflake,M3,dry-run,dry-run,"SELECT COUNT(DISTINCT f.order_id) FROM fact_sales f
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_city cci ON cci.city_key = c.city_key
+JOIN dim_state cst ON cst.state_key = cci.state_key WHERE cst.state_code = 'RJ'",benar,1,,1,1,,,0,,0.0
+pilot_dryrun,2026-11-19T07:43:39+00:00,Q027,L2,ya,oltp,M1,dry-run,dry-run,"SELECT cu.customer_state, ROUND(SUM((oi.price + oi.freight_value)), 2) AS omzet FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN customers cu ON cu.customer_id = o.customer_id WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2017 GROUP BY 1 ORDER BY omzet DESC LIMIT 5",benar,1,,5,5,,,0,,0.0
+pilot_dryrun,2026-11-19T07:43:39+00:00,Q027,L2,ya,oltp,M3,dry-run,dry-run,"SELECT cu.customer_state, ROUND(SUM((oi.price + oi.freight_value)), 2) AS omzet FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN customers cu ON cu.customer_id = o.customer_id WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2017 GROUP BY 1 ORDER BY omzet DESC LIMIT 5",benar,1,,5,5,,,0,,0.0
+pilot_dryrun,2026-11-19T07:43:39+00:00,Q027,L2,ya,star,M1,dry-run,dry-run,"SELECT c.state, ROUND(SUM(f.total_value), 2) AS omzet FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_customer c ON c.customer_key = f.customer_key WHERE d.year = 2017 GROUP BY 1 ORDER BY omzet DESC LIMIT 5",benar,1,,5,5,,,0,,0.0
+pilot_dryrun,2026-11-19T07:43:39+00:00,Q027,L2,ya,star,M3,dry-run,dry-run,"SELECT c.state, ROUND(SUM(f.total_value), 2) AS omzet FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_customer c ON c.customer_key = f.customer_key WHERE d.year = 2017 GROUP BY 1 ORDER BY omzet DESC LIMIT 5",benar,1,,5,5,,,0,,0.0
+pilot_dryrun,2026-11-19T07:43:39+00:00,Q027,L2,ya,snowflake,M1,dry-run,dry-run,"SELECT cst.state_code, ROUND(SUM(f.total_value), 2) AS omzet FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_city cci ON cci.city_key = c.city_key
+JOIN dim_state cst ON cst.state_key = cci.state_key WHERE dm.year_key = 2017 GROUP BY 1 ORDER BY omzet DESC LIMIT 5",benar,1,,5,5,,,0,,0.0
+pilot_dryrun,2026-11-19T07:43:40+00:00,Q027,L2,ya,snowflake,M3,dry-run,dry-run,"SELECT cst.state_code, ROUND(SUM(f.total_value), 2) AS omzet FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_city cci ON cci.city_key = c.city_key
+JOIN dim_state cst ON cst.state_key = cci.state_key WHERE dm.year_key = 2017 GROUP BY 1 ORDER BY omzet DESC LIMIT 5",benar,1,,5,5,,,0,,0.0
+pilot_dryrun,2026-11-19T07:43:40+00:00,Q031,L2,tidak,oltp,M1,dry-run,dry-run,"SELECT se.seller_city, COUNT(*) AS n FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN sellers se ON se.seller_id = oi.seller_id WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2018 GROUP BY 1 ORDER BY n DESC LIMIT 5",benar,1,,5,5,,,0,,0.0
+pilot_dryrun,2026-11-19T07:43:40+00:00,Q031,L2,tidak,oltp,M3,dry-run,dry-run,"SELECT se.seller_city, COUNT(*) AS n FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN sellers se ON se.seller_id = oi.seller_id WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2018 GROUP BY 1 ORDER BY n DESC LIMIT 5",benar,1,,5,5,,,0,,0.0
+pilot_dryrun,2026-11-19T07:43:41+00:00,Q031,L2,tidak,star,M1,dry-run,dry-run,"SELECT s.city, COUNT(*) AS n FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_seller s ON s.seller_key = f.seller_key WHERE d.year = 2018 GROUP BY 1 ORDER BY n DESC LIMIT 5",benar,1,,5,5,,,0,,0.0
+pilot_dryrun,2026-11-19T07:43:41+00:00,Q031,L2,tidak,star,M3,dry-run,dry-run,"SELECT s.city, COUNT(*) AS n FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_seller s ON s.seller_key = f.seller_key WHERE d.year = 2018 GROUP BY 1 ORDER BY n DESC LIMIT 5",benar,1,,5,5,,,0,,0.0
+pilot_dryrun,2026-11-19T07:43:41+00:00,Q031,L2,tidak,snowflake,M1,dry-run,dry-run,"SELECT sci.city_name, COUNT(*) AS n FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+JOIN dim_seller s ON s.seller_key = f.seller_key
+JOIN dim_city sci ON sci.city_key = s.city_key
+JOIN dim_state sst ON sst.state_key = sci.state_key WHERE dm.year_key = 2018 GROUP BY 1 ORDER BY n DESC LIMIT 5",benar,1,,5,5,,,0,,0.0
+pilot_dryrun,2026-11-19T07:43:42+00:00,Q031,L2,tidak,snowflake,M3,dry-run,dry-run,"SELECT sci.city_name, COUNT(*) AS n FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+JOIN dim_seller s ON s.seller_key = f.seller_key
+JOIN dim_city sci ON sci.city_key = s.city_key
+JOIN dim_state sst ON sst.state_key = sci.state_key WHERE dm.year_key = 2018 GROUP BY 1 ORDER BY n DESC LIMIT 5",benar,1,,5,5,,,0,,0.0
+pilot_dryrun,2026-11-19T07:43:43+00:00,Q041,L2,ya,oltp,M1,dry-run,dry-run,"SELECT cu.customer_state, COUNT(DISTINCT oi.order_id) AS n FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN customers cu ON cu.customer_id = o.customer_id
+JOIN products pr ON pr.product_id = oi.product_id
+JOIN product_category_name_translation t ON t.product_category_name = pr.product_category_name WHERE t.product_category_name_english = 'watches_gifts' GROUP BY 1 ORDER BY n DESC LIMIT 5",benar,1,,5,5,,,0,,0.0
+pilot_dryrun,2026-11-19T07:43:43+00:00,Q041,L2,ya,oltp,M3,dry-run,dry-run,"SELECT cu.customer_state, COUNT(DISTINCT oi.order_id) AS n FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN customers cu ON cu.customer_id = o.customer_id
+JOIN products pr ON pr.product_id = oi.product_id
+JOIN product_category_name_translation t ON t.product_category_name = pr.product_category_name WHERE t.product_category_name_english = 'watches_gifts' GROUP BY 1 ORDER BY n DESC LIMIT 5",benar,1,,5,5,,,0,,0.0
+pilot_dryrun,2026-11-19T07:43:43+00:00,Q041,L2,ya,star,M1,dry-run,dry-run,"SELECT c.state, COUNT(DISTINCT f.order_id) AS n FROM fact_sales f
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_product p ON p.product_key = f.product_key WHERE p.category_name = 'watches_gifts' GROUP BY 1 ORDER BY n DESC LIMIT 5",benar,1,,5,5,,,0,,0.0
+pilot_dryrun,2026-11-19T07:43:44+00:00,Q041,L2,ya,star,M3,dry-run,dry-run,"SELECT c.state, COUNT(DISTINCT f.order_id) AS n FROM fact_sales f
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_product p ON p.product_key = f.product_key WHERE p.category_name = 'watches_gifts' GROUP BY 1 ORDER BY n DESC LIMIT 5",benar,1,,5,5,,,0,,0.0
+pilot_dryrun,2026-11-19T07:43:44+00:00,Q041,L2,ya,snowflake,M1,dry-run,dry-run,"SELECT cst.state_code, COUNT(DISTINCT f.order_id) AS n FROM fact_sales f
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_city cci ON cci.city_key = c.city_key
+JOIN dim_state cst ON cst.state_key = cci.state_key
+JOIN dim_product p ON p.product_key = f.product_key
+JOIN dim_category k ON k.category_key = p.category_key WHERE k.category_name = 'watches_gifts' GROUP BY 1 ORDER BY n DESC LIMIT 5",benar,1,,5,5,,,0,,0.0
+pilot_dryrun,2026-11-19T07:43:44+00:00,Q041,L2,ya,snowflake,M3,dry-run,dry-run,"SELECT cst.state_code, COUNT(DISTINCT f.order_id) AS n FROM fact_sales f
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_city cci ON cci.city_key = c.city_key
+JOIN dim_state cst ON cst.state_key = cci.state_key
+JOIN dim_product p ON p.product_key = f.product_key
+JOIN dim_category k ON k.category_key = p.category_key WHERE k.category_name = 'watches_gifts' GROUP BY 1 ORDER BY n DESC LIMIT 5",benar,1,,5,5,,,0,,0.0
+pilot_dryrun,2026-11-19T07:43:45+00:00,Q052,L3,ya,oltp,M1,dry-run,dry-run,"SELECT cu.customer_state, ROUND(SUM((oi.price + oi.freight_value)) / COUNT(DISTINCT oi.order_id), 2) AS aov FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN customers cu ON cu.customer_id = o.customer_id WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2017 GROUP BY 1 ORDER BY aov DESC LIMIT 5",benar,1,,5,5,,,0,,0.0
+pilot_dryrun,2026-11-19T07:43:46+00:00,Q052,L3,ya,oltp,M3,dry-run,dry-run,"SELECT cu.customer_state, ROUND(SUM((oi.price + oi.freight_value)) / COUNT(DISTINCT oi.order_id), 2) AS aov FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN customers cu ON cu.customer_id = o.customer_id WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2017 GROUP BY 1 ORDER BY aov DESC LIMIT 5",benar,1,,5,5,,,0,,0.0
+pilot_dryrun,2026-11-19T07:43:47+00:00,Q052,L3,ya,star,M1,dry-run,dry-run,"SELECT c.state, ROUND(SUM(f.total_value) / COUNT(DISTINCT f.order_id), 2) AS aov FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_customer c ON c.customer_key = f.customer_key WHERE d.year = 2017 GROUP BY 1 ORDER BY aov DESC LIMIT 5",benar,1,,5,5,,,0,,0.0
+pilot_dryrun,2026-11-19T07:43:48+00:00,Q052,L3,ya,star,M3,dry-run,dry-run,"SELECT c.state, ROUND(SUM(f.total_value) / COUNT(DISTINCT f.order_id), 2) AS aov FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_customer c ON c.customer_key = f.customer_key WHERE d.year = 2017 GROUP BY 1 ORDER BY aov DESC LIMIT 5",benar,1,,5,5,,,0,,0.0
+pilot_dryrun,2026-11-19T07:43:50+00:00,Q052,L3,ya,snowflake,M1,dry-run,dry-run,"SELECT cst.state_code, ROUND(SUM(f.total_value) / COUNT(DISTINCT f.order_id), 2) AS aov FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_city cci ON cci.city_key = c.city_key
+JOIN dim_state cst ON cst.state_key = cci.state_key WHERE dm.year_key = 2017 GROUP BY 1 ORDER BY aov DESC LIMIT 5",benar,1,,5,5,,,0,,0.0
+pilot_dryrun,2026-11-19T07:43:51+00:00,Q052,L3,ya,snowflake,M3,dry-run,dry-run,"SELECT cst.state_code, ROUND(SUM(f.total_value) / COUNT(DISTINCT f.order_id), 2) AS aov FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_city cci ON cci.city_key = c.city_key
+JOIN dim_state cst ON cst.state_key = cci.state_key WHERE dm.year_key = 2017 GROUP BY 1 ORDER BY aov DESC LIMIT 5",benar,1,,5,5,,,0,,0.0
+pilot_dryrun,2026-11-19T07:43:53+00:00,Q056,L3,tidak,oltp,M1,dry-run,dry-run,"SELECT t.product_category_name_english, COUNT(DISTINCT oi.seller_id) AS n FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN sellers se ON se.seller_id = oi.seller_id
+JOIN products pr ON pr.product_id = oi.product_id
+JOIN product_category_name_translation t ON t.product_category_name = pr.product_category_name GROUP BY 1 HAVING COUNT(DISTINCT oi.seller_id) > 200 ORDER BY n DESC",benar,1,,11,11,,,0,,0.0
+pilot_dryrun,2026-11-19T07:43:54+00:00,Q056,L3,tidak,oltp,M3,dry-run,dry-run,"SELECT t.product_category_name_english, COUNT(DISTINCT oi.seller_id) AS n FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN sellers se ON se.seller_id = oi.seller_id
+JOIN products pr ON pr.product_id = oi.product_id
+JOIN product_category_name_translation t ON t.product_category_name = pr.product_category_name GROUP BY 1 HAVING COUNT(DISTINCT oi.seller_id) > 200 ORDER BY n DESC",benar,1,,11,11,,,0,,0.0
+pilot_dryrun,2026-11-19T07:43:56+00:00,Q056,L3,tidak,star,M1,dry-run,dry-run,"SELECT p.category_name, COUNT(DISTINCT s.seller_id) AS n FROM fact_sales f
+JOIN dim_seller s ON s.seller_key = f.seller_key
+JOIN dim_product p ON p.product_key = f.product_key GROUP BY 1 HAVING COUNT(DISTINCT s.seller_id) > 200 ORDER BY n DESC",benar,1,,11,11,,,0,,0.0
+pilot_dryrun,2026-11-19T07:43:57+00:00,Q056,L3,tidak,star,M3,dry-run,dry-run,"SELECT p.category_name, COUNT(DISTINCT s.seller_id) AS n FROM fact_sales f
+JOIN dim_seller s ON s.seller_key = f.seller_key
+JOIN dim_product p ON p.product_key = f.product_key GROUP BY 1 HAVING COUNT(DISTINCT s.seller_id) > 200 ORDER BY n DESC",benar,1,,11,11,,,0,,0.0
+pilot_dryrun,2026-11-19T07:43:59+00:00,Q056,L3,tidak,snowflake,M1,dry-run,dry-run,"SELECT k.category_name, COUNT(DISTINCT s.seller_id) AS n FROM fact_sales f
+JOIN dim_seller s ON s.seller_key = f.seller_key
+JOIN dim_city sci ON sci.city_key = s.city_key
+JOIN dim_state sst ON sst.state_key = sci.state_key
+JOIN dim_product p ON p.product_key = f.product_key
+JOIN dim_category k ON k.category_key = p.category_key GROUP BY 1 HAVING COUNT(DISTINCT s.seller_id) > 200 ORDER BY n DESC",benar,1,,11,11,,,0,,0.0
+pilot_dryrun,2026-11-19T07:44:00+00:00,Q056,L3,tidak,snowflake,M3,dry-run,dry-run,"SELECT k.category_name, COUNT(DISTINCT s.seller_id) AS n FROM fact_sales f
+JOIN dim_seller s ON s.seller_key = f.seller_key
+JOIN dim_city sci ON sci.city_key = s.city_key
+JOIN dim_state sst ON sst.state_key = sci.state_key
+JOIN dim_product p ON p.product_key = f.product_key
+JOIN dim_category k ON k.category_key = p.category_key GROUP BY 1 HAVING COUNT(DISTINCT s.seller_id) > 200 ORDER BY n DESC",benar,1,,11,11,,,0,,0.0
+pilot_dryrun,2026-11-19T07:44:01+00:00,Q066,L3,ya,oltp,M1,dry-run,dry-run,"SELECT cu.customer_state, COUNT(DISTINCT oi.order_id) AS n FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN customers cu ON cu.customer_id = o.customer_id WHERE o.order_delivered_customer_date::date - o.order_purchase_timestamp::date > 30 GROUP BY 1 ORDER BY n DESC LIMIT 5",benar,1,,5,5,,,0,,0.0
+pilot_dryrun,2026-11-19T07:44:01+00:00,Q066,L3,ya,oltp,M3,dry-run,dry-run,"SELECT cu.customer_state, COUNT(DISTINCT oi.order_id) AS n FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN customers cu ON cu.customer_id = o.customer_id WHERE o.order_delivered_customer_date::date - o.order_purchase_timestamp::date > 30 GROUP BY 1 ORDER BY n DESC LIMIT 5",benar,1,,5,5,,,0,,0.0
+pilot_dryrun,2026-11-19T07:44:02+00:00,Q066,L3,ya,star,M1,dry-run,dry-run,"SELECT c.state, COUNT(DISTINCT f.order_id) AS n FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+LEFT JOIN dim_date dd ON dd.date_key = f.delivered_customer_date_key
+JOIN dim_customer c ON c.customer_key = f.customer_key WHERE dd.full_date - d.full_date > 30 GROUP BY 1 ORDER BY n DESC LIMIT 5",benar,1,,5,5,,,0,,0.0
+pilot_dryrun,2026-11-19T07:44:02+00:00,Q066,L3,ya,star,M3,dry-run,dry-run,"SELECT c.state, COUNT(DISTINCT f.order_id) AS n FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+LEFT JOIN dim_date dd ON dd.date_key = f.delivered_customer_date_key
+JOIN dim_customer c ON c.customer_key = f.customer_key WHERE dd.full_date - d.full_date > 30 GROUP BY 1 ORDER BY n DESC LIMIT 5",benar,1,,5,5,,,0,,0.0
+pilot_dryrun,2026-11-19T07:44:02+00:00,Q066,L3,ya,snowflake,M1,dry-run,dry-run,"SELECT cst.state_code, COUNT(DISTINCT f.order_id) AS n FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+LEFT JOIN dim_date dd ON dd.date_key = f.delivered_customer_date_key
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_city cci ON cci.city_key = c.city_key
+JOIN dim_state cst ON cst.state_key = cci.state_key WHERE dd.full_date - d.full_date > 30 GROUP BY 1 ORDER BY n DESC LIMIT 5",benar,1,,5,5,,,0,,0.0
+pilot_dryrun,2026-11-19T07:44:03+00:00,Q066,L3,ya,snowflake,M3,dry-run,dry-run,"SELECT cst.state_code, COUNT(DISTINCT f.order_id) AS n FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+LEFT JOIN dim_date dd ON dd.date_key = f.delivered_customer_date_key
+JOIN dim_customer c ON c.customer_key = f.customer_key
+JOIN dim_city cci ON cci.city_key = c.city_key
+JOIN dim_state cst ON cst.state_key = cci.state_key WHERE dd.full_date - d.full_date > 30 GROUP BY 1 ORDER BY n DESC LIMIT 5",benar,1,,5,5,,,0,,0.0
+pilot_dryrun,2026-11-19T07:44:03+00:00,Q076,L4,ya,oltp,M1,dry-run,dry-run,"WITH b AS (SELECT EXTRACT(YEAR FROM o.order_purchase_timestamp)::int AS yr, EXTRACT(MONTH FROM o.order_purchase_timestamp)::int AS mo, SUM((oi.price + oi.freight_value)) AS x FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id GROUP BY 1, 2) SELECT b18.mo, ROUND(100 * (b18.x - b17.x) / b17.x, 2) FROM b b18 JOIN b b17 ON b17.mo = b18.mo AND b17.yr = 2017 WHERE b18.yr = 2018 ORDER BY 1",benar,1,,8,8,,,0,,0.0
+pilot_dryrun,2026-11-19T07:44:04+00:00,Q076,L4,ya,oltp,M3,dry-run,dry-run,"WITH b AS (SELECT EXTRACT(YEAR FROM o.order_purchase_timestamp)::int AS yr, EXTRACT(MONTH FROM o.order_purchase_timestamp)::int AS mo, SUM((oi.price + oi.freight_value)) AS x FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id GROUP BY 1, 2) SELECT b18.mo, ROUND(100 * (b18.x - b17.x) / b17.x, 2) FROM b b18 JOIN b b17 ON b17.mo = b18.mo AND b17.yr = 2017 WHERE b18.yr = 2018 ORDER BY 1",benar,1,,8,8,,,0,,0.0
+pilot_dryrun,2026-11-19T07:44:04+00:00,Q076,L4,ya,star,M1,dry-run,dry-run,"WITH b AS (SELECT d.year AS yr, d.month AS mo, SUM(f.total_value) AS x FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key GROUP BY 1, 2) SELECT b18.mo, ROUND(100 * (b18.x - b17.x) / b17.x, 2) FROM b b18 JOIN b b17 ON b17.mo = b18.mo AND b17.yr = 2017 WHERE b18.yr = 2018 ORDER BY 1",benar,1,,8,8,,,0,,0.0
+pilot_dryrun,2026-11-19T07:44:04+00:00,Q076,L4,ya,star,M3,dry-run,dry-run,"WITH b AS (SELECT d.year AS yr, d.month AS mo, SUM(f.total_value) AS x FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key GROUP BY 1, 2) SELECT b18.mo, ROUND(100 * (b18.x - b17.x) / b17.x, 2) FROM b b18 JOIN b b17 ON b17.mo = b18.mo AND b17.yr = 2017 WHERE b18.yr = 2018 ORDER BY 1",benar,1,,8,8,,,0,,0.0
+pilot_dryrun,2026-11-19T07:44:04+00:00,Q076,L4,ya,snowflake,M1,dry-run,dry-run,"WITH b AS (SELECT dm.year_key AS yr, dm.month AS mo, SUM(f.total_value) AS x FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key GROUP BY 1, 2) SELECT b18.mo, ROUND(100 * (b18.x - b17.x) / b17.x, 2) FROM b b18 JOIN b b17 ON b17.mo = b18.mo AND b17.yr = 2017 WHERE b18.yr = 2018 ORDER BY 1",benar,1,,8,8,,,0,,0.0
+pilot_dryrun,2026-11-19T07:44:05+00:00,Q076,L4,ya,snowflake,M3,dry-run,dry-run,"WITH b AS (SELECT dm.year_key AS yr, dm.month AS mo, SUM(f.total_value) AS x FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key GROUP BY 1, 2) SELECT b18.mo, ROUND(100 * (b18.x - b17.x) / b17.x, 2) FROM b b18 JOIN b b17 ON b17.mo = b18.mo AND b17.yr = 2017 WHERE b18.yr = 2018 ORDER BY 1",benar,1,,8,8,,,0,,0.0
+pilot_dryrun,2026-11-19T07:44:05+00:00,Q086,L4,tidak,oltp,M1,dry-run,dry-run,"WITH x AS (SELECT se.seller_state AS st, oi.seller_id AS sid, COUNT(*) AS n FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN sellers se ON se.seller_id = oi.seller_id WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2018 AND se.seller_state IN ('SP', 'RJ', 'MG') GROUP BY 1, 2), r AS (SELECT *, RANK() OVER (PARTITION BY st ORDER BY n DESC) AS rk FROM x) SELECT st, sid, n FROM r WHERE rk <= 3",benar,1,,9,9,,,0,,0.0
+pilot_dryrun,2026-11-19T07:44:06+00:00,Q086,L4,tidak,oltp,M3,dry-run,dry-run,"WITH x AS (SELECT se.seller_state AS st, oi.seller_id AS sid, COUNT(*) AS n FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN sellers se ON se.seller_id = oi.seller_id WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2018 AND se.seller_state IN ('SP', 'RJ', 'MG') GROUP BY 1, 2), r AS (SELECT *, RANK() OVER (PARTITION BY st ORDER BY n DESC) AS rk FROM x) SELECT st, sid, n FROM r WHERE rk <= 3",benar,1,,9,9,,,0,,0.0
+pilot_dryrun,2026-11-19T07:44:06+00:00,Q086,L4,tidak,star,M1,dry-run,dry-run,"WITH x AS (SELECT s.state AS st, s.seller_id AS sid, COUNT(*) AS n FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_seller s ON s.seller_key = f.seller_key WHERE d.year = 2018 AND s.state IN ('SP', 'RJ', 'MG') GROUP BY 1, 2), r AS (SELECT *, RANK() OVER (PARTITION BY st ORDER BY n DESC) AS rk FROM x) SELECT st, sid, n FROM r WHERE rk <= 3",benar,1,,9,9,,,0,,0.0
+pilot_dryrun,2026-11-19T07:44:06+00:00,Q086,L4,tidak,star,M3,dry-run,dry-run,"WITH x AS (SELECT s.state AS st, s.seller_id AS sid, COUNT(*) AS n FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_seller s ON s.seller_key = f.seller_key WHERE d.year = 2018 AND s.state IN ('SP', 'RJ', 'MG') GROUP BY 1, 2), r AS (SELECT *, RANK() OVER (PARTITION BY st ORDER BY n DESC) AS rk FROM x) SELECT st, sid, n FROM r WHERE rk <= 3",benar,1,,9,9,,,0,,0.0
+pilot_dryrun,2026-11-19T07:44:06+00:00,Q086,L4,tidak,snowflake,M1,dry-run,dry-run,"WITH x AS (SELECT sst.state_code AS st, s.seller_id AS sid, COUNT(*) AS n FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+JOIN dim_seller s ON s.seller_key = f.seller_key
+JOIN dim_city sci ON sci.city_key = s.city_key
+JOIN dim_state sst ON sst.state_key = sci.state_key WHERE dm.year_key = 2018 AND sst.state_code IN ('SP', 'RJ', 'MG') GROUP BY 1, 2), r AS (SELECT *, RANK() OVER (PARTITION BY st ORDER BY n DESC) AS rk FROM x) SELECT st, sid, n FROM r WHERE rk <= 3",benar,1,,9,9,,,0,,0.0
+pilot_dryrun,2026-11-19T07:44:07+00:00,Q086,L4,tidak,snowflake,M3,dry-run,dry-run,"WITH x AS (SELECT sst.state_code AS st, s.seller_id AS sid, COUNT(*) AS n FROM fact_sales f
+JOIN dim_date d ON d.date_key = f.purchase_date_key
+JOIN dim_month dm ON dm.month_key = d.month_key
+JOIN dim_seller s ON s.seller_key = f.seller_key
+JOIN dim_city sci ON sci.city_key = s.city_key
+JOIN dim_state sst ON sst.state_key = sci.state_key WHERE dm.year_key = 2018 AND sst.state_code IN ('SP', 'RJ', 'MG') GROUP BY 1, 2), r AS (SELECT *, RANK() OVER (PARTITION BY st ORDER BY n DESC) AS rk FROM x) SELECT st, sid, n FROM r WHERE rk <= 3",benar,1,,9,9,,,0,,0.0
