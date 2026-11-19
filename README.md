@@ -3,7 +3,7 @@
 Penelitian tesis Magister — Universitas Esa Unggul.
 
 **Topik:** pengaruh model skema data warehouse (OLTP / star / snowflake) dan kelengkapan metadata
-(M0 / M1 / M2) terhadap akurasi LLM dalam menerjemahkan pertanyaan bisnis **Bahasa Indonesia** menjadi SQL.
+(M1 / M2 / M3) terhadap akurasi LLM dalam menerjemahkan pertanyaan bisnis **Bahasa Indonesia** menjadi SQL.
 Desain eksperimen faktorial 3 × 3, metrik utama *Execution Accuracy*.
 
 - Dataset: [Brazilian E-Commerce Public Dataset by Olist](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) (CC BY-NC-SA 4.0) — **tidak disertakan** di repo ini, unduh dari Kaggle.
@@ -19,7 +19,7 @@ Desain eksperimen faktorial 3 × 3, metrik utama *Execution Accuracy*.
 | `sql/06_user_readonly.sql` | User `llm_reader` (read-only, timeout 30 dtk) untuk menjalankan SQL buatan LLM |
 | `metadata/<skema>_M{0,1,2}.sql` | 9 teks metadata skema yang disisipkan ke prompt |
 | `buat_metadata.py` | Generator ke-9 file metadata (satu kamus deskripsi untuk semua skema) |
-| `docs/pedoman-metadata-soal.md` | Definisi M0/M1/M2, template prompt, pedoman 100 soal, aturan penilaian EX |
+| `docs/pedoman-metadata-soal.md` | Definisi M1/M2/M3, template prompt, pedoman 100 soal, aturan penilaian EX |
 | `soal/` | 100 soal + 300 SQL kunci + validasi otomatis (lihat `soal/README.md`) |
 | `contoh/contoh_soal.sql` | 4 contoh soal (L1–L4) dengan SQL kunci di 3 skema |
 | `eksperimen/jalankan.py` | Skrip pilot & eksperimen penuh (lihat `eksperimen/README.md`) |
@@ -49,7 +49,7 @@ python buat_metadata.py
 
 - [x] Build DW + 6/6 uji kesetaraan lulus
 - [x] User read-only + koneksi OpenRouter
-- [x] Metadata M0/M1/M2 (disetujui 18 Nov 2026)
+- [x] Metadata M1/M2/M3 (disetujui 18 Nov 2026)
 - [x] 100 soal + 300 SQL kunci (lolos validasi 100/100)
 - [x] Skrip pilot & eksperimen (`eksperimen/jalankan.py`, dry-run 900/900)
 - [ ] Pilot 2 kandidat model

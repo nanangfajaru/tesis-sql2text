@@ -7,7 +7,7 @@ Kolom tiap soal:
 
 Topik: waktu, produk, pelanggan, penjual, pengiriman, status.
 Aturan glosarium: glos=True bila jawaban bergantung pada definisi/pemetaan yang
-hanya ada di metadata M2: omzet/nilai penjualan, pelanggan unik, AOV, lama
+hanya ada di metadata M3: omzet/nilai penjualan, pelanggan unik, AOV, lama
 pengiriman, terlambat, pelanggan baru, nama kategori Bahasa Indonesia, nama
 lengkap negara bagian, format nama kota.
 """

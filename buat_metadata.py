@@ -2,9 +2,9 @@
 buat_metadata.py — Membangkitkan 9 teks metadata skema (3 skema x 3 level)
 untuk disisipkan ke prompt LLM.
 
-  M0 = nama tabel + nama kolom + tipe data
-  M1 = M0 + PRIMARY KEY / FOREIGN KEY + label peran tabel
-  M2 = M1 + deskripsi & sinonim Bahasa Indonesia per tabel/kolom
+  M1 = nama tabel + nama kolom + tipe data
+  M2 = M1 + PRIMARY KEY / FOREIGN KEY + label peran tabel
+  M3 = M2 + deskripsi & sinonim Bahasa Indonesia per tabel/kolom
           + format nilai + glosarium istilah bisnis
 
 Prinsip: konsep yang sama diberi deskripsi yang SAMA di ketiga skema,
@@ -222,7 +222,7 @@ OLTP = [
 ]
 
 # ------------------------------------------------------------------
-# Glosarium (hanya M2) — sama untuk ketiga skema
+# Glosarium (hanya M3) — sama untuk ketiga skema
 # ------------------------------------------------------------------
 STATES = ("AC=Acre, AL=Alagoas, AM=Amazonas, AP=Amapa, BA=Bahia, CE=Ceara, DF=Distrito Federal (Brasilia), "
           "ES=Espirito Santo, GO=Goias, MA=Maranhao, MG=Minas Gerais, MS=Mato Grosso do Sul, MT=Mato Grosso, "
@@ -334,7 +334,7 @@ def main():
     os.makedirs(OUT, exist_ok=True)
     for skema, tables in (("oltp", OLTP), ("star", STAR), ("snowflake", SNOWFLAKE)):
         for level in (0, 1, 2):
-            p = os.path.join(OUT, f"{skema}_M{level}.sql")
+            p = os.path.join(OUT, f"{skema}_M{level + 1}.sql")
             with open(p, "w", encoding="utf-8") as f:
                 f.write(render(tables, level, skema))
             print(p)

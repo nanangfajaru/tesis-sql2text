@@ -9,7 +9,7 @@
 | Pilot model B | `python eksperimen/jalankan.py --model qwen/qwen3.8-27b --pilot` | 60 |
 | Penuh | `python eksperimen/jalankan.py --model <id> --provider "<penyedia>"` | 900 |
 
-Pilot = 10 soal (L1 2, L2 3, L3 3, L4 2) × 3 skema × metadata M0 & M2.
+Pilot = 10 soal (L1 2, L2 3, L3 3, L4 2) × 3 skema × metadata M1 & M3.
 
 Pengaturan tetap: zero-shot, temperature 0, seed 42, max 1024 token, reasoning dimatikan,
 penyedia dikunci (`allow_fallbacks = false`; bila `--provider` tidak diisi, penyedia pertama
