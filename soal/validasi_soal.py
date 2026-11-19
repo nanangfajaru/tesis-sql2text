@@ -28,7 +28,7 @@ from soal_def import S  # noqa: E402
 
 SCHEMAS = ["oltp", "star", "snowflake"]
 HERE = os.path.dirname(os.path.abspath(__file__))
-TIE_COL = {"Q092": 1, "Q058": 2}       # indeks kolom pengurut bila bukan kolom terakhir
+TIE_COL = {"Q092": 1, "Q058": 2, "Q031": 2, "Q072": 2}       # indeks kolom pengurut bila bukan kolom terakhir
 RANK_ROWS = {"Q077": 3, "Q086": 9}      # soal ranking per grup: jumlah baris yang diharapkan
 
 
