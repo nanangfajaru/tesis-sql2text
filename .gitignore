@@ -49,3 +49,7 @@ desktop.ini
 
 # --- Dokumen sementara Office --------------------------------
 ~$*
+
+# --- Data & keluaran simulasi (bukan hasil penelitian) ---
+hasil/simulasi.csv
+analisis/output/

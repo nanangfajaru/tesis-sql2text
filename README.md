@@ -22,6 +22,7 @@ Desain eksperimen faktorial 3 × 3, metrik utama *Execution Accuracy*.
 | `docs/pedoman-metadata-soal.md` | Definisi M1/M2/M3, template prompt, pedoman 100 soal, aturan penilaian EX |
 | `soal/` | 100 soal + 300 SQL kunci + validasi otomatis (lihat `soal/README.md`) |
 | `contoh/contoh_soal.sql` | 4 contoh soal (L1–L4) dengan SQL kunci di 3 skema |
+| `analisis/analisis.py` | Analisis Bab 4: akurasi + regresi logistik GEE (lihat `analisis/README.md`) |
 | `eksperimen/jalankan.py` | Skrip pilot & eksperimen penuh (lihat `eksperimen/README.md`) |
 | `cek_koneksi.py` | Cek kesiapan: `.env`, API key OpenRouter, koneksi DB read-only, 1 panggilan model |
 | `profil_dataset.py` | Profil/audit CSV dataset (DuckDB) |
@@ -53,4 +54,4 @@ python buat_metadata.py
 - [x] 100 soal + 300 SQL kunci (lolos validasi 100/100)
 - [x] Skrip pilot & eksperimen (`eksperimen/jalankan.py`, dry-run 900/900)
 - [ ] Pilot 2 kandidat model
-- [ ] Analisis statistik
+- [x] Skrip analisis statistik (regresi logistik, diuji dengan data simulasi)
