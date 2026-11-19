@@ -1,0 +1,927 @@
+run,waktu_utc,id,tingkat,butuh_glosarium,skema,metadata,model,penyedia,sql_model,status,benar,pesan_error,baris_model,baris_kunci,token_masuk,token_keluar,token_reasoning,biaya_usd,latensi_dtk
+pilot_qwen-qwen3-8-27b,2026-11-19T07:52:54+00:00,Q004,L1,ya,oltp,M1,qwen/qwen3.8-27b,Wafer,"SELECT SUM(oi.price) AS total_revenue
+FROM order_items oi
+JOIN orders o ON oi.order_id = o.order_id
+WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp) = 2018",hasil_salah,0,,1,1,398,52,0,0.00013828,0.89
+pilot_qwen-qwen3-8-27b,2026-11-19T07:52:55+00:00,Q004,L1,ya,oltp,M3,qwen/qwen3.8-27b,Wafer,"SELECT SUM(oi.price + oi.freight_value) AS total_revenue
+FROM order_items oi
+JOIN orders o ON oi.order_id = o.order_id
+WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp) = 2018",benar,1,,1,1,2480,57,0,0.0002742,1.56
+pilot_qwen-qwen3-8-27b,2026-11-19T07:52:56+00:00,Q004,L1,ya,star,M1,qwen/qwen3.8-27b,Wafer,"SELECT SUM(f.total_value) AS total_revenue
+FROM fact_sales f
+JOIN dim_date d ON f.purchase_date_key = d.date_key
+WHERE d.year = 2018",benar,1,,1,1,487,46,0,0.00013042,0.66
+pilot_qwen-qwen3-8-27b,2026-11-19T07:52:57+00:00,Q004,L1,ya,star,M3,qwen/qwen3.8-27b,Wafer,"SELECT SUM(f.total_value) AS total_revenue
+FROM fact_sales f
+JOIN dim_date d ON f.purchase_date_key = d.date_key
+WHERE d.year = 2018",benar,1,,1,1,2702,46,0,0.00026332,1.14
+pilot_qwen-qwen3-8-27b,2026-11-19T07:52:58+00:00,Q004,L1,ya,snowflake,M1,qwen/qwen3.8-27b,Wafer,"SELECT SUM(fs.total_value) AS total_revenue
+FROM fact_sales fs
+JOIN dim_date dd ON fs.purchase_date_key = dd.date_key
+JOIN dim_month dm ON dd.month_key = dm.month_key
+WHERE dm.year_key = 2018",benar,1,,1,1,573,60,0,0.00016638,0.77
+pilot_qwen-qwen3-8-27b,2026-11-19T07:52:59+00:00,Q004,L1,ya,snowflake,M3,qwen/qwen3.8-27b,Wafer,"SELECT SUM(f.total_value) AS omzet_total
+FROM fact_sales f
+JOIN dim_date d ON f.purchase_date_key = d.date_key
+JOIN dim_month m ON d.month_key = m.month_key
+JOIN dim_year y ON m.year_key = y.year_key
+WHERE y.year_key = 2018",benar,1,,1,1,3028,73,0,0.00034228,0.68
+pilot_qwen-qwen3-8-27b,2026-11-19T07:53:00+00:00,Q010,L1,tidak,oltp,M1,qwen/qwen3.8-27b,Wafer,"SELECT COUNT(DISTINCT o.order_id) AS jumlah_pesanan
+FROM orders o
+JOIN customers c ON o.customer_id = c.customer_id
+WHERE c.customer_state = 'RJ'",benar,1,,1,1,398,44,0,0.00012068,1.74
+pilot_qwen-qwen3-8-27b,2026-11-19T07:53:02+00:00,Q010,L1,tidak,oltp,M3,qwen/qwen3.8-27b,Wafer,"SELECT COUNT(DISTINCT o.order_id) AS jumlah_pesanan
+FROM orders o
+JOIN customers c ON o.customer_id = c.customer_id
+WHERE c.customer_state = 'RJ'",benar,1,,1,1,2480,44,0,0.000243168,0.65
+pilot_qwen-qwen3-8-27b,2026-11-19T07:53:03+00:00,Q010,L1,tidak,star,M1,qwen/qwen3.8-27b,Wafer,"SELECT COUNT(DISTINCT f.order_id) AS jumlah_pesanan
+FROM fact_sales f
+JOIN dim_customer c ON f.customer_key = c.customer_key
+WHERE c.state = 'RJ'",benar,1,,1,1,487,45,0,0.000127772,0.65
+pilot_qwen-qwen3-8-27b,2026-11-19T07:53:03+00:00,Q010,L1,tidak,star,M3,qwen/qwen3.8-27b,Wafer,"SELECT COUNT(DISTINCT fs.order_id) AS jumlah_pesanan
+FROM fact_sales fs
+JOIN dim_customer dc ON fs.customer_key = dc.customer_key
+WHERE dc.state = 'RJ'",benar,1,,1,1,2702,45,0,0.00026112,1.09
+pilot_qwen-qwen3-8-27b,2026-11-19T07:53:05+00:00,Q010,L1,tidak,snowflake,M1,qwen/qwen3.8-27b,Wafer,"SELECT COUNT(DISTINCT fs.order_id) AS jumlah_pesanan
+FROM fact_sales fs
+JOIN dim_customer dc ON fs.customer_key = dc.customer_key
+JOIN dim_city dcit ON dc.city_key = dcit.city_key
+JOIN dim_state ds ON dcit.state_key = ds.state_key
+WHERE ds.state_code = 'RJ'",benar,1,,1,1,573,75,0,0.000198868,0.66
+pilot_qwen-qwen3-8-27b,2026-11-19T07:53:06+00:00,Q010,L1,tidak,snowflake,M3,qwen/qwen3.8-27b,Wafer,"SELECT COUNT(DISTINCT fs.order_id) AS jumlah_pesanan
+FROM fact_sales fs
+JOIN dim_customer dc ON fs.customer_key = dc.customer_key
+JOIN dim_city dcit ON dc.city_key = dcit.city_key
+JOIN dim_state ds ON dcit.state_key = ds.state_key
+WHERE ds.state_code = 'RJ'",benar,1,,1,1,3028,75,0,0.000343672,0.61
+pilot_qwen-qwen3-8-27b,2026-11-19T07:53:07+00:00,Q027,L2,ya,oltp,M1,qwen/qwen3.8-27b,Wafer,"SELECT 
+    c.customer_state,
+    SUM(oi.price) AS total_revenue
+FROM 
+    orders o
+JOIN 
+    customers c ON o.customer_id = c.customer_id
+JOIN 
+    order_items oi ON o.order_id = oi.order_id
+WHERE 
+    EXTRACT(YEAR FROM o.order_purchase_timestamp) = 2017
+GROUP BY 
+    c.customer_state
+ORDER BY 
+    total_revenue DESC
+LIMIT 5",hasil_salah,0,,5,5,409,101,0,0.00024674,0.82
+pilot_qwen-qwen3-8-27b,2026-11-19T07:53:08+00:00,Q027,L2,ya,oltp,M3,qwen/qwen3.8-27b,Wafer,"SELECT 
+    c.customer_state,
+    SUM(oi.price + oi.freight_value) AS omzet
+FROM 
+    orders o
+JOIN 
+    order_items oi ON o.order_id = oi.order_id
+JOIN 
+    customers c ON o.customer_id = c.customer_id
+WHERE 
+    EXTRACT(YEAR FROM o.order_purchase_timestamp) = 2017
+GROUP BY 
+    c.customer_state
+ORDER BY 
+    omzet DESC
+LIMIT 5",benar,1,,5,5,2491,104,0,0.000375828,2.92
+pilot_qwen-qwen3-8-27b,2026-11-19T07:53:11+00:00,Q027,L2,ya,star,M1,qwen/qwen3.8-27b,Wafer,"WITH revenue_by_state AS (
+    SELECT
+        dc.state,
+        SUM(fs.total_value) AS total_revenue
+    FROM
+        fact_sales fs
+    JOIN
+        dim_customer dc ON fs.customer_key = dc.customer_key
+    JOIN
+        dim_date dd ON fs.purchase_date_key = dd.date_key
+    WHERE
+        dd.year = 2017
+    GROUP BY
+        dc.state
+)
+SELECT
+    state,
+    total_revenue
+FROM
+    revenue_by_state
+ORDER BY
+    total_revenue DESC
+LIMIT 5",benar,1,,5,5,498,127,0,0.000308832,0.89
+pilot_qwen-qwen3-8-27b,2026-11-19T07:53:12+00:00,Q027,L2,ya,star,M3,qwen/qwen3.8-27b,Wafer,"SELECT 
+    dc.state,
+    SUM(fs.total_value) AS omzet
+FROM fact_sales fs
+JOIN dim_customer dc ON fs.customer_key = dc.customer_key
+JOIN dim_date dd ON fs.purchase_date_key = dd.date_key
+WHERE dd.year = 2017
+GROUP BY dc.state
+ORDER BY omzet DESC
+LIMIT 5",benar,1,,5,5,2713,80,0,0.000336156,0.7
+pilot_qwen-qwen3-8-27b,2026-11-19T07:53:13+00:00,Q027,L2,ya,snowflake,M1,qwen/qwen3.8-27b,Wafer,"WITH sales_2017 AS (
+    SELECT 
+        fs.customer_key,
+        SUM(fs.total_value) AS total_revenue
+    FROM fact_sales fs
+    JOIN dim_date dd ON fs.purchase_date_key = dd.date_key
+    WHERE dd.full_date >= '2017-01-01' AND dd.full_date < '2018-01-01'
+    GROUP BY fs.customer_key
+),
+customer_state AS (
+    SELECT 
+        dc.customer_key,
+        ds.state_code,
+        ss.total_revenue
+    FROM dim_customer dc
+    JOIN dim_city dci ON dc.city_key = dci.city_key
+    JOIN dim_state ds ON dci.state_key = ds.state_key
+    JOIN sales_2017 ss ON dc.customer_key = ss.customer_key
+)
+SELECT 
+    cs.state_code,
+    SUM(cs.total_revenue) AS total_revenue
+FROM customer_state cs
+GROUP BY cs.state_code
+ORDER BY total_revenue DESC
+LIMIT 5",benar,1,,5,5,584,227,0,0.000533928,1.09
+pilot_qwen-qwen3-8-27b,2026-11-19T07:53:15+00:00,Q027,L2,ya,snowflake,M3,qwen/qwen3.8-27b,Wafer,"SELECT 
+    ds.state_code,
+    SUM(fs.total_value) AS omzet
+FROM fact_sales fs
+JOIN dim_customer dc ON fs.customer_key = dc.customer_key
+JOIN dim_city dcit ON dc.city_key = dcit.city_key
+JOIN dim_state ds ON dcit.state_key = ds.state_key
+JOIN dim_date dd ON fs.purchase_date_key = dd.date_key
+JOIN dim_month dm ON dd.month_key = dm.month_key
+JOIN dim_year dy ON dm.year_key = dy.year_key
+WHERE dy.year_key = 2017
+GROUP BY ds.state_code
+ORDER BY omzet DESC
+LIMIT 5",benar,1,,5,5,3039,138,0,0.00048594,1.26
+pilot_qwen-qwen3-8-27b,2026-11-19T07:53:16+00:00,Q031,L2,tidak,oltp,M1,qwen/qwen3.8-27b,Wafer,"SELECT 
+    s.seller_city,
+    s.seller_state,
+    COUNT(oi.order_item_id) AS total_items_sold
+FROM 
+    order_items oi
+JOIN 
+    orders o ON oi.order_id = o.order_id
+JOIN 
+    sellers s ON oi.seller_id = s.seller_id
+WHERE 
+    EXTRACT(YEAR FROM o.order_purchase_timestamp) = 2017
+GROUP BY 
+    s.seller_city,
+    s.seller_state
+ORDER BY 
+    total_items_sold DESC
+LIMIT 5",benar,1,,5,5,417,121,0,0.00029122,0.73
+pilot_qwen-qwen3-8-27b,2026-11-19T07:53:17+00:00,Q031,L2,tidak,oltp,M3,qwen/qwen3.8-27b,Wafer,"SELECT 
+    s.seller_city,
+    s.seller_state,
+    COUNT(*) AS total_items
+FROM order_items oi
+JOIN orders o ON oi.order_id = o.order_id
+JOIN sellers s ON oi.seller_id = s.seller_id
+WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp) = 2017
+GROUP BY s.seller_city, s.seller_state
+ORDER BY total_items DESC
+LIMIT 5",benar,1,,5,5,2499,100,0,0.000367508,1.05
+pilot_qwen-qwen3-8-27b,2026-11-19T07:53:19+00:00,Q031,L2,tidak,star,M1,qwen/qwen3.8-27b,Wafer,"SELECT 
+    ds.city,
+    ds.state,
+    COUNT(*) AS item_count
+FROM fact_sales fs
+JOIN dim_seller ds ON fs.seller_key = ds.seller_key
+JOIN dim_date dd ON fs.purchase_date_key = dd.date_key
+WHERE dd.year = 2017
+GROUP BY ds.city, ds.state
+ORDER BY item_count DESC
+LIMIT 5",benar,1,,5,5,506,88,0,0.000223512,0.92
+pilot_qwen-qwen3-8-27b,2026-11-19T07:53:20+00:00,Q031,L2,tidak,star,M3,qwen/qwen3.8-27b,Wafer,"SELECT 
+    ds.city,
+    ds.state,
+    COUNT(*) AS total_items
+FROM fact_sales fs
+JOIN dim_seller ds ON fs.seller_key = ds.seller_key
+JOIN dim_date dd ON fs.purchase_date_key = dd.date_key
+WHERE dd.year = 2017
+GROUP BY ds.city, ds.state
+ORDER BY total_items DESC
+LIMIT 5",benar,1,,5,5,2721,88,0,0.000354236,1.53
+pilot_qwen-qwen3-8-27b,2026-11-19T07:53:21+00:00,Q031,L2,tidak,snowflake,M1,qwen/qwen3.8-27b,Wafer,"WITH sales_2017 AS (
+    SELECT
+        fs.seller_key,
+        COUNT(*) AS item_count
+    FROM fact_sales fs
+    JOIN dim_date dd ON fs.purchase_date_key = dd.date_key
+    JOIN dim_month dm ON dd.month_key = dm.month_key
+    WHERE dm.year_key = 2017
+    GROUP BY fs.seller_key
+),
+seller_city AS (
+    SELECT
+        ds.seller_key,
+        dc.city_name,
+        ds.state_key,
+        ss.state_code,
+        s2017.item_count
+    FROM sales_2017 s2017
+    JOIN dim_seller ds ON s2017.seller_key = ds.seller_key
+    JOIN dim_city dc ON ds.city_key = dc.city_key
+    JOIN dim_state ss ON dc.state_key = ss.state_key
+)
+SELECT
+    sc.city_name,
+    sc.state_code,
+    SUM(sc.item_count) AS total_items
+FROM seller_city sc
+GROUP BY sc.city_name, sc.state_code
+ORDER BY total_items DESC
+LIMIT 5",error_eksekusi,0,column ds.state_key does not exist,,5,592,246,0,0.000576208,2.34
+pilot_qwen-qwen3-8-27b,2026-11-19T07:53:24+00:00,Q031,L2,tidak,snowflake,M3,qwen/qwen3.8-27b,Wafer,"SELECT 
+    dc.city_name,
+    ds.state_code,
+    COUNT(*) AS total_items
+FROM fact_sales fs
+JOIN dim_date dd ON fs.purchase_date_key = dd.date_key
+JOIN dim_seller ds ON fs.seller_key = ds.seller_key
+JOIN dim_city dc ON ds.city_key = dc.city_key
+JOIN dim_state dst ON dc.state_key = dst.state_key
+WHERE dd.month_key BETWEEN 201701 AND 201712
+GROUP BY dc.city_name, ds.state_code
+ORDER BY total_items DESC
+LIMIT 5",error_eksekusi,0,column ds.state_code does not exist,,5,3047,129,0,0.000463612,0.79
+pilot_qwen-qwen3-8-27b,2026-11-19T07:53:25+00:00,Q041,L2,ya,oltp,M1,qwen/qwen3.8-27b,Wafer,"WITH target_categories AS (
+    SELECT product_category_name
+    FROM product_category_name_translation
+    WHERE product_category_name_english IN ('watches', 'gifts')
+),
+relevant_orders AS (
+    SELECT DISTINCT oi.order_id
+    FROM order_items oi
+    JOIN products p ON oi.product_id = p.product_id
+    JOIN target_categories tc ON p.product_category_name = tc.product_category_name
+)
+SELECT 
+    c.customer_state,
+    COUNT(o.order_id) AS order_count
+FROM orders o
+JOIN customers c ON o.customer_id = c.customer_id
+JOIN relevant_orders ro ON o.order_id = ro.order_id
+GROUP BY c.customer_state
+ORDER BY order_count DESC
+LIMIT 5",hasil_salah,0,,0,5,409,156,0,0.00036774,1.75
+pilot_qwen-qwen3-8-27b,2026-11-19T07:53:27+00:00,Q041,L2,ya,oltp,M3,qwen/qwen3.8-27b,Wafer,"SELECT 
+    c.customer_state,
+    COUNT(DISTINCT o.order_id) AS jumlah_pesanan
+FROM orders o
+JOIN customers c ON o.customer_id = c.customer_id
+JOIN order_items oi ON o.order_id = oi.order_id
+JOIN products p ON oi.product_id = p.product_id
+JOIN product_category_name_translation t ON p.product_category_name = t.product_category_name
+WHERE t.product_category_name_english = 'watches_gifts'
+GROUP BY c.customer_state
+ORDER BY jumlah_pesanan DESC
+LIMIT 5",benar,1,,5,5,2491,118,0,0.000406628,0.91
+pilot_qwen-qwen3-8-27b,2026-11-19T07:53:28+00:00,Q041,L2,ya,star,M1,qwen/qwen3.8-27b,Wafer,"SELECT 
+    dc.state,
+    COUNT(*) AS order_count
+FROM 
+    fact_sales fs
+JOIN 
+    dim_product dp ON fs.product_key = dp.product_key
+JOIN 
+    dim_customer dc ON fs.customer_key = dc.customer_key
+WHERE 
+    dp.category_name IN ('watches', 'gifts')
+GROUP BY 
+    dc.state
+ORDER BY 
+    order_count DESC
+LIMIT 5",hasil_salah,0,,0,5,498,92,0,0.000231832,1.05
+pilot_qwen-qwen3-8-27b,2026-11-19T07:53:29+00:00,Q041,L2,ya,star,M3,qwen/qwen3.8-27b,Wafer,"SELECT 
+    dc.state,
+    COUNT(DISTINCT fs.order_id) AS jumlah_pesanan
+FROM fact_sales fs
+JOIN dim_product dp ON fs.product_key = dp.product_key
+JOIN dim_customer dc ON fs.customer_key = dc.customer_key
+WHERE dp.category_name = 'watches_gifts'
+GROUP BY dc.state
+ORDER BY jumlah_pesanan DESC
+LIMIT 5",benar,1,,5,5,2713,86,0,0.000349356,0.8
+pilot_qwen-qwen3-8-27b,2026-11-19T07:53:30+00:00,Q041,L2,ya,snowflake,M1,qwen/qwen3.8-27b,Wafer,"WITH target_categories AS (
+    SELECT category_key
+    FROM dim_category
+    WHERE category_name IN ('watches', 'gifts')
+       OR category_name_portuguese IN ('relogios', 'presentes')
+),
+state_orders AS (
+    SELECT
+        ds.state_code,
+        COUNT(*) AS order_count
+    FROM fact_sales fs
+    JOIN dim_product dp ON fs.product_key = dp.product_key
+    JOIN dim_customer dc ON fs.customer_key = dc.customer_key
+    JOIN dim_city dcit ON dc.city_key = dcit.city_key
+    JOIN dim_state ds ON dcit.state_key = ds.state_key
+    WHERE dp.category_key IN (SELECT category_key FROM target_categories)
+    GROUP BY ds.state_code
+)
+SELECT
+    state_code,
+    order_count
+FROM state_orders
+ORDER BY order_count DESC
+LIMIT 5",hasil_salah,0,,0,5,584,191,0,0.000454728,0.97
+pilot_qwen-qwen3-8-27b,2026-11-19T07:53:31+00:00,Q041,L2,ya,snowflake,M3,qwen/qwen3.8-27b,Wafer,"SELECT 
+    ds.state_code,
+    COUNT(DISTINCT fs.order_id) AS order_count
+FROM fact_sales fs
+JOIN dim_product dp ON fs.product_key = dp.product_key
+JOIN dim_category dc ON dp.category_key = dc.category_key
+JOIN dim_customer dcust ON fs.customer_key = dcust.customer_key
+JOIN dim_city dcity ON dcust.city_key = dcity.city_key
+JOIN dim_state ds ON dcity.state_key = ds.state_key
+WHERE dc.category_name = 'watches_gifts'
+GROUP BY ds.state_code
+ORDER BY order_count DESC
+LIMIT 5",benar,1,,5,5,3039,131,0,0.000467596,1.31
+pilot_qwen-qwen3-8-27b,2026-11-19T07:53:33+00:00,Q052,L3,ya,oltp,M1,qwen/qwen3.8-27b,Wafer,"WITH order_aov AS (
+    SELECT 
+        o.order_id,
+        c.customer_state,
+        SUM(oi.price + oi.freight_value) AS total_order_value
+    FROM orders o
+    JOIN customers c ON o.customer_id = c.customer_id
+    JOIN order_items oi ON o.order_id = oi.order_id
+    WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp) = 2017
+    GROUP BY o.order_id, c.customer_state
+)
+SELECT 
+    customer_state,
+    ROUND(AVG(total_order_value), 2) AS avg_order_value
+FROM order_aov
+GROUP BY customer_state
+ORDER BY avg_order_value DESC
+LIMIT 5",benar,1,,5,5,415,152,0,0.0003593,1.35
+pilot_qwen-qwen3-8-27b,2026-11-19T07:53:35+00:00,Q052,L3,ya,oltp,M3,qwen/qwen3.8-27b,Wafer,"SELECT 
+    c.customer_state,
+    ROUND(AVG(oi.price + oi.freight_value), 2) AS aov
+FROM orders o
+JOIN customers c ON o.customer_id = c.customer_id
+JOIN order_items oi ON o.order_id = oi.order_id
+WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp) = 2017
+GROUP BY c.customer_state
+ORDER BY aov DESC
+LIMIT 5",hasil_salah,0,,5,5,2497,97,0,0.000360788,0.67
+pilot_qwen-qwen3-8-27b,2026-11-19T07:53:37+00:00,Q052,L3,ya,star,M1,qwen/qwen3.8-27b,Wafer,"WITH aov_by_state AS (
+    SELECT
+        dc.state,
+        AVG(fs.total_value) AS avg_order_value
+    FROM fact_sales fs
+    JOIN dim_customer dc ON fs.customer_key = dc.customer_key
+    JOIN dim_date dd ON fs.purchase_date_key = dd.date_key
+    WHERE dd.year = 2017
+    GROUP BY dc.state
+)
+SELECT
+    state,
+    avg_order_value
+FROM aov_by_state
+ORDER BY avg_order_value DESC
+LIMIT 5",hasil_salah,0,,5,5,504,115,0,0.000282792,0.76
+pilot_qwen-qwen3-8-27b,2026-11-19T07:53:38+00:00,Q052,L3,ya,star,M3,qwen/qwen3.8-27b,Wafer,"WITH order_revenue AS (
+    SELECT
+        fs.order_id,
+        dc.state,
+        SUM(fs.total_value) AS order_total
+    FROM fact_sales fs
+    JOIN dim_date dd ON fs.purchase_date_key = dd.date_key
+    JOIN dim_customer dc ON fs.customer_key = dc.customer_key
+    WHERE dd.year = 2017
+    GROUP BY fs.order_id, dc.state
+)
+SELECT
+    state,
+    ROUND(AVG(order_total), 2) AS aov
+FROM order_revenue
+GROUP BY state
+ORDER BY aov DESC
+LIMIT 5",benar,1,,5,5,2719,134,0,0.000455316,0.82
+pilot_qwen-qwen3-8-27b,2026-11-19T07:53:41+00:00,Q052,L3,ya,snowflake,M1,qwen/qwen3.8-27b,Wafer,"WITH aov_by_state AS (
+    SELECT
+        ds.state_code,
+        AVG(fs.total_value) AS avg_order_value
+    FROM fact_sales fs
+    JOIN dim_customer dc ON fs.customer_key = dc.customer_key
+    JOIN dim_city dcit ON dc.city_key = dcit.city_key
+    JOIN dim_state ds ON dcit.state_key = ds.state_key
+    JOIN dim_date dd ON fs.purchase_date_key = dd.date_key
+    WHERE dd.full_date >= '2017-01-01'
+      AND dd.full_date < '2018-01-01'
+    GROUP BY ds.state_code
+)
+SELECT
+    state_code,
+    ROUND(avg_order_value, 2) AS aov
+FROM aov_by_state
+ORDER BY avg_order_value DESC
+LIMIT 5",hasil_salah,0,,5,5,590,184,0,0.000439688,0.92
+pilot_qwen-qwen3-8-27b,2026-11-19T07:53:42+00:00,Q052,L3,ya,snowflake,M3,qwen/qwen3.8-27b,Wafer,"WITH order_revenue AS (
+    SELECT
+        fs.order_id,
+        dc.state_key,
+        SUM(fs.total_value) AS order_total
+    FROM fact_sales fs
+    JOIN dim_customer cust ON fs.customer_key = cust.customer_key
+    JOIN dim_city city ON cust.city_key = city.city_key
+    JOIN dim_state dc ON city.state_key = dc.state_key
+    JOIN dim_date dd ON fs.purchase_date_key = dd.date_key
+    WHERE dd.month_key BETWEEN 201701 AND 201712
+    GROUP BY fs.order_id, dc.state_key
+)
+SELECT
+    ds.state_code,
+    ROUND(AVG(orr.order_total), 2) AS aov
+FROM order_revenue orr
+JOIN dim_state ds ON orr.state_key = ds.state_key
+GROUP BY ds.state_code
+ORDER BY aov DESC
+LIMIT 5",benar,1,,5,5,3045,197,0,0.000613156,0.89
+pilot_qwen-qwen3-8-27b,2026-11-19T07:53:45+00:00,Q056,L3,tidak,oltp,M1,qwen/qwen3.8-27b,Wafer,"SELECT 
+    p.product_category_name,
+    COUNT(DISTINCT oi.seller_id) AS seller_count
+FROM products p
+JOIN order_items oi ON p.product_id = oi.product_id
+GROUP BY p.product_category_name
+HAVING COUNT(DISTINCT oi.seller_id) > 200
+ORDER BY seller_count DESC",hasil_salah,0,,11,11,417,76,0,0.00019222,0.66
+pilot_qwen-qwen3-8-27b,2026-11-19T07:53:46+00:00,Q056,L3,tidak,oltp,M3,qwen/qwen3.8-27b,Wafer,"SELECT 
+    t.product_category_name_english AS category,
+    COUNT(DISTINCT oi.seller_id) AS seller_count
+FROM order_items oi
+JOIN products p ON oi.product_id = p.product_id
+JOIN product_category_name_translation t ON p.product_category_name = t.product_category_name
+GROUP BY t.product_category_name_english
+HAVING COUNT(DISTINCT oi.seller_id) > 200
+ORDER BY seller_count DESC",benar,1,,11,11,2499,99,0,0.000365308,2.69
+pilot_qwen-qwen3-8-27b,2026-11-19T07:53:51+00:00,Q056,L3,tidak,star,M1,qwen/qwen3.8-27b,Wafer,"SELECT 
+    dp.category_name,
+    COUNT(DISTINCT fs.seller_key) AS seller_count
+FROM 
+    fact_sales fs
+JOIN 
+    dim_product dp ON fs.product_key = dp.product_key
+GROUP BY 
+    dp.category_name
+HAVING 
+    COUNT(DISTINCT fs.seller_key) > 200
+ORDER BY 
+    seller_count DESC",benar,1,,11,11,506,85,0,0.000216912,0.68
+pilot_qwen-qwen3-8-27b,2026-11-19T07:53:52+00:00,Q056,L3,tidak,star,M3,qwen/qwen3.8-27b,Wafer,"SELECT 
+    dp.category_name,
+    COUNT(DISTINCT fs.seller_key) AS seller_count
+FROM fact_sales fs
+JOIN dim_product dp ON fs.product_key = dp.product_key
+GROUP BY dp.category_name
+HAVING COUNT(DISTINCT fs.seller_key) > 200
+ORDER BY seller_count DESC",benar,1,,11,11,2721,75,0,0.000325636,0.65
+pilot_qwen-qwen3-8-27b,2026-11-19T07:53:55+00:00,Q056,L3,tidak,snowflake,M1,qwen/qwen3.8-27b,Wafer,"SELECT 
+    dc.category_name,
+    COUNT(DISTINCT fs.seller_key) AS seller_count
+FROM fact_sales fs
+JOIN dim_product dp ON fs.product_key = dp.product_key
+JOIN dim_category dc ON dp.category_key = dc.category_key
+GROUP BY dc.category_name
+HAVING COUNT(DISTINCT fs.seller_key) > 200
+ORDER BY seller_count DESC",benar,1,,11,11,592,88,0,0.000228608,0.59
+pilot_qwen-qwen3-8-27b,2026-11-19T07:53:56+00:00,Q056,L3,tidak,snowflake,M3,qwen/qwen3.8-27b,Wafer,"SELECT 
+    dc.category_name,
+    COUNT(DISTINCT fs.seller_key) AS seller_count
+FROM fact_sales fs
+JOIN dim_product dp ON fs.product_key = dp.product_key
+JOIN dim_category dc ON dp.category_key = dc.category_key
+GROUP BY dc.category_name
+HAVING COUNT(DISTINCT fs.seller_key) > 200
+ORDER BY seller_count DESC",benar,1,,11,11,3047,88,0,0.000373476,0.6
+pilot_qwen-qwen3-8-27b,2026-11-19T07:53:57+00:00,Q066,L3,ya,oltp,M1,qwen/qwen3.8-27b,Wafer,"WITH delivery_duration AS (
+    SELECT 
+        o.order_id,
+        c.customer_state,
+        (o.order_delivered_customer_date - o.order_purchase_timestamp) AS delivery_days
+    FROM orders o
+    JOIN customers c ON o.customer_id = c.customer_id
+    WHERE o.order_delivered_customer_date IS NOT NULL
+      AND o.order_purchase_timestamp IS NOT NULL
+)
+SELECT 
+    customer_state,
+    COUNT(order_id) AS order_count
+FROM delivery_duration
+WHERE delivery_days > 30
+GROUP BY customer_state
+ORDER BY order_count DESC
+LIMIT 5",error_eksekusi,0,operator does not exist: interval > integer,,5,415,130,0,0.000310516,0.8
+pilot_qwen-qwen3-8-27b,2026-11-19T07:53:58+00:00,Q066,L3,ya,oltp,M3,qwen/qwen3.8-27b,Wafer,"SELECT 
+    c.customer_state,
+    COUNT(DISTINCT o.order_id) AS jumlah_pesanan
+FROM orders o
+JOIN customers c ON o.customer_id = c.customer_id
+WHERE o.order_delivered_customer_date IS NOT NULL
+  AND o.order_purchase_timestamp IS NOT NULL
+  AND (o.order_delivered_customer_date - o.order_purchase_timestamp) > INTERVAL '30 days'
+GROUP BY c.customer_state
+ORDER BY jumlah_pesanan DESC
+LIMIT 5",hasil_salah,0,,5,5,2497,105,0,0.000378388,0.76
+pilot_qwen-qwen3-8-27b,2026-11-19T07:53:59+00:00,Q066,L3,ya,star,M1,qwen/qwen3.8-27b,Wafer,"WITH long_delivery_orders AS (
+    SELECT
+        fc.state,
+        COUNT(*) AS order_count
+    FROM
+        fact_sales fs
+    JOIN
+        dim_customer fc ON fs.customer_key = fc.customer_key
+    JOIN
+        dim_date dd_purchase ON fs.purchase_date_key = dd_purchase.date_key
+    JOIN
+        dim_date dd_delivered ON fs.delivered_customer_date_key = dd_delivered.date_key
+    WHERE
+        dd_delivered.full_date - dd_purchase.full_date > 30
+    GROUP BY
+        fc.state
+)
+SELECT
+    state,
+    order_count
+FROM
+    long_delivery_orders
+ORDER BY
+    order_count DESC
+LIMIT 5",hasil_salah,0,,5,5,504,152,0,0.000364192,0.91
+pilot_qwen-qwen3-8-27b,2026-11-19T07:54:00+00:00,Q066,L3,ya,star,M3,qwen/qwen3.8-27b,Wafer,"WITH delivery_metrics AS (
+    SELECT
+        dc.state,
+        fs.order_id,
+        (dd_delivered.full_date - dd_purchase.full_date) AS delivery_days
+    FROM fact_sales fs
+    JOIN dim_customer dc ON fs.customer_key = dc.customer_key
+    JOIN dim_date dd_purchase ON fs.purchase_date_key = dd_purchase.date_key
+    JOIN dim_date dd_delivered ON fs.delivered_customer_date_key = dd_delivered.date_key
+    WHERE dd_delivered.full_date IS NOT NULL
+      AND dd_purchase.full_date IS NOT NULL
+),
+late_orders AS (
+    SELECT
+        state,
+        order_id
+    FROM delivery_metrics
+    WHERE delivery_days > 30
+    GROUP BY state, order_id
+)
+SELECT
+    state,
+    COUNT(DISTINCT order_id) AS order_count
+FROM late_orders
+GROUP BY state
+ORDER BY order_count DESC
+LIMIT 5",benar,1,,5,5,2719,200,0,0.000600452,1.03
+pilot_qwen-qwen3-8-27b,2026-11-19T07:54:01+00:00,Q066,L3,ya,snowflake,M1,qwen/qwen3.8-27b,Wafer,"WITH long_delivery_orders AS (
+    SELECT
+        f.customer_key,
+        f.order_id
+    FROM fact_sales f
+    JOIN dim_date dd_purchase ON f.purchase_date_key = dd_purchase.date_key
+    JOIN dim_date dd_delivered ON f.delivered_customer_date_key = dd_delivered.date_key
+    WHERE f.delivered_customer_date_key IS NOT NULL
+      AND f.purchase_date_key IS NOT NULL
+      AND (dd_delivered.full_date - dd_purchase.full_date) > 30
+),
+state_order_counts AS (
+    SELECT
+        ds.state_code,
+        COUNT(DISTINCT ldo.order_id) AS order_count
+    FROM long_delivery_orders ldo
+    JOIN dim_customer dc ON ldo.customer_key = dc.customer_key
+    JOIN dim_city dcit ON dc.city_key = dcit.city_key
+    JOIN dim_state ds ON dcit.state_key = ds.state_key
+    GROUP BY ds.state_code
+)
+SELECT
+    state_code,
+    order_count
+FROM state_order_counts
+ORDER BY order_count DESC
+LIMIT 5",benar,1,,5,5,590,232,0,0.000545288,1.1
+pilot_qwen-qwen3-8-27b,2026-11-19T07:54:03+00:00,Q066,L3,ya,snowflake,M3,qwen/qwen3.8-27b,Wafer,"WITH delivery_metrics AS (
+    SELECT
+        s.state_code,
+        COUNT(DISTINCT fs.order_id) AS order_count
+    FROM fact_sales fs
+    JOIN dim_customer dc ON fs.customer_key = dc.customer_key
+    JOIN dim_city dc_city ON dc.city_key = dc_city.city_key
+    JOIN dim_state s ON dc_city.state_key = s.state_key
+    WHERE fs.delivered_customer_date_key IS NOT NULL
+      AND fs.purchase_date_key IS NOT NULL
+      AND (
+          (SELECT full_date FROM dim_date WHERE date_key = fs.delivered_customer_date_key) -
+          (SELECT full_date FROM dim_date WHERE date_key = fs.purchase_date_key)
+      ) > 30
+    GROUP BY s.state_code
+)
+SELECT
+    state_code,
+    order_count
+FROM delivery_metrics
+ORDER BY order_count DESC
+LIMIT 5",benar,1,,5,5,3045,191,0,0.000599892,2.2
+pilot_qwen-qwen3-8-27b,2026-11-19T07:54:07+00:00,Q076,L4,ya,oltp,M1,qwen/qwen3.8-27b,Wafer,"WITH monthly_revenue AS (
+    SELECT 
+        EXTRACT(YEAR FROM oi.shipping_limit_date) AS year,
+        EXTRACT(MONTH FROM oi.shipping_limit_date) AS month,
+        SUM(oi.price) AS revenue
+    FROM order_items oi
+    JOIN orders o ON oi.order_id = o.order_id
+    WHERE o.order_status = 'delivered'
+      AND EXTRACT(YEAR FROM oi.shipping_limit_date) IN (2017, 2018)
+      AND EXTRACT(MONTH FROM oi.shipping_limit_date) BETWEEN 1 AND 8
+    GROUP BY 
+        EXTRACT(YEAR FROM oi.shipping_limit_date),
+        EXTRACT(MONTH FROM oi.shipping_limit_date)
+)
+SELECT 
+    m2018.month AS month_number,
+    ROUND(((m2018.revenue - m2017.revenue) / m2017.revenue) * 100, 2) AS growth_percentage
+FROM monthly_revenue m2018
+JOIN monthly_revenue m2017 
+    ON m2018.month = m2017.month
+    AND m2017.year = 2017
+WHERE m2018.year = 2018
+ORDER BY m2018.month",hasil_salah,0,,8,8,424,298,0,0.00068104,1.18
+pilot_qwen-qwen3-8-27b,2026-11-19T07:54:09+00:00,Q076,L4,ya,oltp,M3,qwen/qwen3.8-27b,Wafer,"WITH monthly_revenue AS (
+    SELECT 
+        EXTRACT(YEAR FROM o.order_purchase_timestamp) AS yr,
+        EXTRACT(MONTH FROM o.order_purchase_timestamp) AS mo,
+        SUM(oi.price + oi.freight_value) AS revenue
+    FROM orders o
+    JOIN order_items oi ON o.order_id = oi.order_id
+    WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp) IN (2017, 2018)
+      AND EXTRACT(MONTH FROM o.order_purchase_timestamp) BETWEEN 1 AND 8
+    GROUP BY 1, 2
+)
+SELECT 
+    m2018.mo AS month_number,
+    ROUND(((m2018.revenue - m2017.revenue) / m2017.revenue) * 100, 2) AS growth_percentage
+FROM monthly_revenue m2018
+JOIN monthly_revenue m2017 ON m2018.mo = m2017.mo
+WHERE m2018.yr = 2018
+  AND m2017.yr = 2017
+ORDER BY m2018.mo",benar,1,,8,8,2506,266,0,0.000733128,1.36
+pilot_qwen-qwen3-8-27b,2026-11-19T07:54:11+00:00,Q076,L4,ya,star,M1,qwen/qwen3.8-27b,Wafer,"WITH monthly_revenue AS (
+    SELECT 
+        d.month,
+        d.year,
+        SUM(f.total_value) AS revenue
+    FROM fact_sales f
+    JOIN dim_date d ON f.purchase_date_key = d.date_key
+    WHERE d.year IN (2017, 2018)
+      AND d.month BETWEEN 1 AND 8
+    GROUP BY d.month, d.year
+)
+SELECT 
+    m2018.month,
+    ROUND(((m2018.revenue - m2017.revenue) / NULLIF(m2017.revenue, 0)) * 100, 2) AS growth_percentage
+FROM monthly_revenue m2018
+JOIN monthly_revenue m2017 ON m2018.month = m2017.month
+WHERE m2018.year = 2018
+  AND m2017.year = 2017
+ORDER BY m2018.month",benar,1,,8,8,513,225,0,0.000525332,1.01
+pilot_qwen-qwen3-8-27b,2026-11-19T07:54:12+00:00,Q076,L4,ya,star,M3,qwen/qwen3.8-27b,Wafer,"WITH monthly_revenue AS (
+    SELECT
+        d.month,
+        d.year,
+        SUM(f.total_value) AS revenue
+    FROM fact_sales f
+    JOIN dim_date d ON f.purchase_date_key = d.date_key
+    WHERE d.year IN (2017, 2018)
+      AND d.month BETWEEN 1 AND 8
+    GROUP BY d.month, d.year
+)
+SELECT
+    m2018.month,
+    ROUND(
+        (m2018.revenue - m2017.revenue) * 100.0 / NULLIF(m2017.revenue, 0),
+        2
+    ) AS growth_percentage
+FROM monthly_revenue m2018
+JOIN monthly_revenue m2017
+    ON m2018.month = m2017.month
+WHERE m2018.year = 2018
+  AND m2017.year = 2017
+ORDER BY m2018.month",benar,1,,8,8,2728,235,0,0.000678056,1.13
+pilot_qwen-qwen3-8-27b,2026-11-19T07:54:13+00:00,Q076,L4,ya,snowflake,M1,qwen/qwen3.8-27b,Wafer,"WITH monthly_revenue AS (
+    SELECT 
+        dm.month,
+        dm.year_key,
+        SUM(fs.total_value) AS revenue
+    FROM fact_sales fs
+    JOIN dim_date dd ON fs.purchase_date_key = dd.date_key
+    JOIN dim_month dm ON dd.month_key = dm.month_key
+    WHERE dm.year_key IN (2017, 2018)
+      AND dm.month BETWEEN 1 AND 8
+    GROUP BY dm.month, dm.year_key
+)
+SELECT 
+    m2018.month,
+    ROUND(
+        ((m2018.revenue - m2017.revenue) / NULLIF(m2017.revenue, 0)) * 100, 
+        2
+    ) AS growth_percentage
+FROM monthly_revenue m2018
+JOIN monthly_revenue m2017 
+    ON m2018.month = m2017.month
+    AND m2017.year_key = 2017
+WHERE m2018.year_key = 2018
+ORDER BY m2018.month",benar,1,,8,8,599,253,0,0.000592028,1.63
+pilot_qwen-qwen3-8-27b,2026-11-19T07:54:15+00:00,Q076,L4,ya,snowflake,M3,qwen/qwen3.8-27b,Wafer,"WITH monthly_revenue AS (
+    SELECT
+        dm.month,
+        dm.year_key,
+        SUM(fs.total_value) AS revenue
+    FROM fact_sales fs
+    JOIN dim_date dd ON fs.purchase_date_key = dd.date_key
+    JOIN dim_month dm ON dd.month_key = dm.month_key
+    WHERE dm.year_key IN (2017, 2018)
+      AND dm.month BETWEEN 1 AND 8
+    GROUP BY dm.month, dm.year_key
+)
+SELECT
+    m2018.month,
+    ROUND(
+        ((m2018.revenue - m2017.revenue) / NULLIF(m2017.revenue, 0)) * 100,
+        2
+    ) AS growth_percentage
+FROM monthly_revenue m2018
+JOIN monthly_revenue m2017
+    ON m2018.month = m2017.month
+    AND m2017.year_key = 2017
+WHERE m2018.year_key = 2018
+ORDER BY m2018.month",benar,1,,8,8,3054,253,0,0.000736896,1.07
+pilot_qwen-qwen3-8-27b,2026-11-19T07:54:16+00:00,Q086,L4,tidak,oltp,M1,qwen/qwen3.8-27b,Wafer,"WITH seller_items_2018 AS (
+    SELECT
+        s.seller_state,
+        s.seller_id,
+        COUNT(oi.order_item_id) AS item_count
+    FROM sellers s
+    JOIN order_items oi ON s.seller_id = oi.seller_id
+    JOIN orders o ON oi.order_id = o.order_id
+    WHERE s.seller_state IN ('SP', 'RJ', 'MG')
+      AND EXTRACT(YEAR FROM o.order_purchase_timestamp) = 2018
+    GROUP BY s.seller_state, s.seller_id
+),
+ranked_sellers AS (
+    SELECT
+        seller_state,
+        seller_id,
+        item_count,
+        ROW_NUMBER() OVER (PARTITION BY seller_state ORDER BY item_count DESC) AS rn
+    FROM seller_items_2018
+)
+SELECT
+    seller_state,
+    seller_id,
+    item_count
+FROM ranked_sellers
+WHERE rn <= 3
+ORDER BY seller_state, item_count DESC",benar,1,,9,9,432,224,0,0.00051872,0.99
+pilot_qwen-qwen3-8-27b,2026-11-19T07:54:18+00:00,Q086,L4,tidak,oltp,M3,qwen/qwen3.8-27b,Wafer,"WITH seller_items AS (
+    SELECT
+        s.seller_state,
+        s.seller_id,
+        COUNT(*) AS item_count
+    FROM order_items oi
+    JOIN orders o ON oi.order_id = o.order_id
+    JOIN sellers s ON oi.seller_id = s.seller_id
+    WHERE s.seller_state IN ('SP', 'RJ', 'MG')
+      AND EXTRACT(YEAR FROM o.order_purchase_timestamp) = 2018
+    GROUP BY s.seller_state, s.seller_id
+),
+ranked AS (
+    SELECT
+        seller_state,
+        seller_id,
+        item_count,
+        ROW_NUMBER() OVER (PARTITION BY seller_state ORDER BY item_count DESC) AS rn
+    FROM seller_items
+)
+SELECT
+    seller_state,
+    seller_id,
+    item_count
+FROM ranked
+WHERE rn <= 3
+ORDER BY seller_state, item_count DESC",benar,1,,9,9,2514,205,0,0.000599408,0.99
+pilot_qwen-qwen3-8-27b,2026-11-19T07:54:19+00:00,Q086,L4,tidak,star,M1,qwen/qwen3.8-27b,Wafer,"WITH seller_items_2018 AS (
+    SELECT
+        s.state,
+        s.seller_id,
+        COUNT(f.order_item_id) AS item_count
+    FROM fact_sales f
+    JOIN dim_seller s ON f.seller_key = s.seller_key
+    JOIN dim_date d ON f.purchase_date_key = d.date_key
+    WHERE s.state IN ('SP', 'RJ', 'MG')
+      AND d.year = 2018
+    GROUP BY s.state, s.seller_id
+),
+ranked_sellers AS (
+    SELECT
+        state,
+        seller_id,
+        item_count,
+        ROW_NUMBER() OVER (PARTITION BY state ORDER BY item_count DESC) AS rn
+    FROM seller_items_2018
+)
+SELECT
+    state,
+    seller_id,
+    item_count
+FROM ranked_sellers
+WHERE rn <= 3
+ORDER BY state, item_count DESC",benar,1,,9,9,521,209,0,0.000490612,0.86
+pilot_qwen-qwen3-8-27b,2026-11-19T07:54:20+00:00,Q086,L4,tidak,star,M3,qwen/qwen3.8-27b,Wafer,"WITH seller_items AS (
+    SELECT
+        s.state,
+        s.seller_id,
+        COUNT(*) AS item_count,
+        ROW_NUMBER() OVER (PARTITION BY s.state ORDER BY COUNT(*) DESC) AS rn
+    FROM fact_sales f
+    JOIN dim_seller s ON f.seller_key = s.seller_key
+    JOIN dim_date d ON f.purchase_date_key = d.date_key
+    WHERE s.state IN ('SP', 'RJ', 'MG')
+      AND d.year = 2018
+    GROUP BY s.state, s.seller_id
+)
+SELECT
+    state,
+    seller_id,
+    item_count
+FROM seller_items
+WHERE rn <= 3
+ORDER BY state, item_count DESC",benar,1,,9,9,2736,165,0,0.000524536,0.77
+pilot_qwen-qwen3-8-27b,2026-11-19T07:54:21+00:00,Q086,L4,tidak,snowflake,M1,qwen/qwen3.8-27b,Wafer,"WITH seller_items_2018 AS (
+    SELECT
+        ds.state_code,
+        dsl.seller_id,
+        COUNT(*) AS item_count
+    FROM fact_sales fs
+    JOIN dim_seller dsl ON fs.seller_key = dsl.seller_key
+    JOIN dim_city dc ON dsl.city_key = dc.city_key
+    JOIN dim_state ds ON dc.state_key = ds.state_key
+    JOIN dim_date dd ON fs.purchase_date_key = dd.date_key
+    WHERE ds.state_code IN ('SP', 'RJ', 'MG')
+      AND dd.full_date >= '2018-01-01'
+      AND dd.full_date < '2019-01-01'
+    GROUP BY ds.state_code, dsl.seller_id
+),
+ranked_sellers AS (
+    SELECT
+        state_code,
+        seller_id,
+        item_count,
+        ROW_NUMBER() OVER (PARTITION BY state_code ORDER BY item_count DESC) AS rn
+    FROM seller_items_2018
+)
+SELECT
+    state_code,
+    seller_id,
+    item_count
+FROM ranked_sellers
+WHERE rn <= 3
+ORDER BY state_code, rn",benar,1,,9,9,607,270,0,0.000629908,1.03
+pilot_qwen-qwen3-8-27b,2026-11-19T07:54:22+00:00,Q086,L4,tidak,snowflake,M3,qwen/qwen3.8-27b,Wafer,"WITH seller_items AS (
+    SELECT
+        s.state_code,
+        sl.seller_id,
+        COUNT(*) AS item_count,
+        ROW_NUMBER() OVER (
+            PARTITION BY s.state_code
+            ORDER BY COUNT(*) DESC
+        ) AS rn
+    FROM fact_sales fs
+    JOIN dim_seller sl ON fs.seller_key = sl.seller_key
+    JOIN dim_city c ON sl.city_key = c.city_key
+    JOIN dim_state s ON c.state_key = s.state_key
+    JOIN dim_date d ON fs.purchase_date_key = d.date_key
+    WHERE s.state_code IN ('SP', 'RJ', 'MG')
+      AND d.full_date >= '2018-01-01'
+      AND d.full_date < '2019-01-01'
+    GROUP BY s.state_code, sl.seller_id
+)
+SELECT
+    state_code,
+    seller_id,
+    item_count
+FROM seller_items
+WHERE rn <= 3
+ORDER BY state_code, item_count DESC",benar,1,,9,9,3062,232,0,0.000691176,1.27
