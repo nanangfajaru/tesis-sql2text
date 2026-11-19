@@ -1,4 +1,4 @@
-# Metadata M0/M1/M2 & Pedoman 100 Soal (v1.0 — DISETUJUI 18 Nov 2026)
+# Metadata M1/M2/M3 & Pedoman 100 Soal (v1.0 — DISETUJUI 18 Nov 2026)
 
 Status: **disetujui seluruhnya oleh Nanang, 18 Nov 2026 15:38.** Menjadi acuan penulisan soal dan eksperimen.
 File pendukung: `metadata/` (9 file), `buat_metadata.py`, `contoh/contoh_soal.sql`.
@@ -12,11 +12,11 @@ Metadata ditulis sebagai **DDL `CREATE TABLE`** (representasi kode), mengikuti r
 
 | Level | Isi | Ukuran (± token) OLTP / Star / Snowflake |
 |---|---|---|
-| **M0** | nama tabel, nama kolom, tipe data | 310 / 360 / 440 |
-| **M1** | M0 + PRIMARY KEY + FOREIGN KEY (REFERENCES) + label peran tabel | 440 / 520 / 740 |
-| **M2** | M1 + deskripsi & sinonim Bahasa Indonesia per tabel/kolom + format nilai + glosarium istilah bisnis | 2.300 / 2.400 / 2.700 |
+| **M1** | nama tabel, nama kolom, tipe data | 310 / 360 / 440 |
+| **M2** | M1 + PRIMARY KEY + FOREIGN KEY (REFERENCES) + label peran tabel | 440 / 520 / 740 |
+| **M3** | M2 + deskripsi & sinonim Bahasa Indonesia per tabel/kolom + format nilai + glosarium istilah bisnis | 2.300 / 2.400 / 2.700 |
 
-Label peran tabel (M1):
+Label peran tabel (M2):
 - Star & snowflake: *tabel fakta*, *tabel dimensi*, *tabel sub-dimensi (normalisasi)*.
 - OLTP (tidak punya konsep fakta/dimensi): *tabel transaksi* (orders, order_items), *tabel master* (customers, sellers, products), *tabel referensi* (product_category_name_translation).
 
@@ -26,7 +26,7 @@ Label peran tabel (M1):
 3. **Diverifikasi otomatis:** ke-9 file lolos eksekusi sebagai DDL PostgreSQL, dan daftar kolomnya identik 100% dengan database asli.
 4. Tabel yang dirujuk ditulis lebih dulu, tabel fakta/transaksi di akhir.
 
-### 1.3 Isi M2 yang tidak bisa ditebak dari nama kolom
+### 1.3 Isi M3 yang tidak bisa ditebak dari nama kolom
 - `customer_id` = ID **per pesanan**; jumlah pelanggan harus memakai `customer_unique_id` (98.353 vs 95.121).
 - Omzet = `price + freight_value`; di OLTP tidak ada kolom total.
 - Grain: satu baris = satu item; jumlah pesanan = `COUNT(DISTINCT order_id)`.
@@ -36,7 +36,7 @@ Label peran tabel (M1):
 - Status pesanan (6 nilai) dan artinya; tanpa keterangan status = semua status.
 
 ### 1.4 Catatan untuk Bab 3 (keterbatasan)
-M2 ±5× lebih panjang dari M1. Efek M2 = efek *isi* + *panjang* prompt; ini disebut sebagai batasan.
+M3 ±5× lebih panjang dari M2. Efek M3 = efek *isi* + *panjang* prompt; ini disebut sebagai batasan.
 
 ---
 
@@ -76,7 +76,7 @@ Waktu/tren (±20) · Produk & kategori (±20) · Pelanggan & lokasi (±20) · Pe
 2. **Jangan menyalin nama tabel, kolom, atau nilai database** (tulis "dibatalkan", bukan `canceled`; "kesehatan dan kecantikan", bukan `health_beauty`).
 3. Sebut jelas kolom yang diminta tampil ("tampilkan nama kategori dan omzetnya").
 4. Periode selalu eksplisit (tahun/bulan/kuartal dalam Jan 2017–Agu 2018); tidak ada "tahun ini".
-5. **Tidak ada aturan tersembunyi:** semua istilah bisnis mengikuti glosarium M2; status tidak disebut = semua status.
+5. **Tidak ada aturan tersembunyi:** semua istilah bisnis mengikuti glosarium M3; status tidak disebut = semua status.
 6. Satu soal = satu jawaban pasti. Top-N tidak boleh seri di batas N (dicek otomatis).
 7. Hasil tidak kosong dan ≤100 baris.
 

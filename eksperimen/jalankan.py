@@ -6,7 +6,7 @@ Alur per pemanggilan: rakit prompt (template + metadata kondisi + soal) -> OpenR
 -> bandingkan dengan hasil SQL kunci (aturan EX pedoman v1.0) -> simpan.
 
 Contoh (Git Bash, dari folder repo):
-  # pilot: 10 soal x 3 skema x M0,M2 = 60 panggilan
+  # pilot: 10 soal x 3 skema x M1,M3 = 60 panggilan
   python eksperimen/jalankan.py --model qwen/qwen3-coder-30b-a3b-instruct --pilot
   python eksperimen/jalankan.py --model qwen/qwen3.8-27b --pilot
 
@@ -39,7 +39,7 @@ import psycopg
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 URL = "https://openrouter.ai/api/v1/chat/completions"
 SCHEMAS = ["oltp", "star", "snowflake"]
-LEVELS = ["M0", "M1", "M2"]
+LEVELS = ["M1", "M2", "M3"]
 PILOT = ["Q004", "Q010", "Q027", "Q031", "Q041", "Q052", "Q056", "Q066", "Q076", "Q086"]
 SEED = 42
 MAX_TOKENS = 1024
@@ -171,9 +171,9 @@ def main():
     ap.add_argument("--provider", default=None,
                     help="kunci ke satu penyedia (mis. 'Amazon Bedrock'); bila kosong, penyedia "
                          "pertama yang menjawab dikunci untuk sisa run")
-    ap.add_argument("--pilot", action="store_true", help="10 soal pilot, metadata M0 & M2")
+    ap.add_argument("--pilot", action="store_true", help="10 soal pilot, metadata M1 & M3")
     ap.add_argument("--soal", default=None, help="daftar id dipisah koma (opsional)")
-    ap.add_argument("--metadata", default=None, help="mis. M0,M2 (default: semua / pilot M0,M2)")
+    ap.add_argument("--metadata", default=None, help="mis. M1,M3 (default: semua / pilot M1,M3)")
     ap.add_argument("--run", default=None, help="nama run (default otomatis)")
     ap.add_argument("--dry-run", action="store_true", help="tanpa API: jawaban = SQL kunci")
     a = ap.parse_args()
@@ -186,7 +186,7 @@ def main():
     soal = load_soal()
     meta = load_meta()
     ids = a.soal.split(",") if a.soal else (PILOT if a.pilot else list(soal))
-    levels = a.metadata.split(",") if a.metadata else (["M0", "M2"] if a.pilot else LEVELS)
+    levels = a.metadata.split(",") if a.metadata else (["M1", "M3"] if a.pilot else LEVELS)
     tag = "dryrun" if a.dry_run else re.sub(r"[^a-z0-9]+", "-", a.model.lower()).strip("-")
     run = a.run or f"{'pilot' if a.pilot else 'penuh'}_{tag}"
 
