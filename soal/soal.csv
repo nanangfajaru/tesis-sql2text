@@ -176,16 +176,16 @@ Q030,L2,status,tidak,"Tampilkan setiap status pesanan beserta jumlah itemnya, ur
 JOIN orders o ON o.order_id = oi.order_id GROUP BY 1 ORDER BY n DESC","SELECT os.order_status, COUNT(*) AS n FROM fact_sales f
 JOIN dim_order_status os ON os.order_status_key = f.order_status_key GROUP BY 1 ORDER BY n DESC","SELECT os.order_status, COUNT(*) AS n FROM fact_sales f
 JOIN dim_order_status os ON os.order_status_key = f.order_status_key GROUP BY 1 ORDER BY n DESC",ya,6,
-Q031,L2,"penjual,waktu",tidak,Sebutkan 5 kota penjual dengan jumlah item terjual terbanyak pada tahun 2018 beserta jumlah itemnya.,"SELECT se.seller_city, COUNT(*) AS n FROM order_items oi
+Q031,L2,"penjual,waktu",tidak,"Sebutkan 5 kota penjual dengan jumlah item terjual terbanyak pada tahun 2017, beserta negara bagian kota tersebut dan jumlah itemnya.","SELECT se.seller_city, se.seller_state, COUNT(*) AS n FROM order_items oi
 JOIN orders o ON o.order_id = oi.order_id
-JOIN sellers se ON se.seller_id = oi.seller_id WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2018 GROUP BY 1 ORDER BY n DESC LIMIT 5","SELECT s.city, COUNT(*) AS n FROM fact_sales f
+JOIN sellers se ON se.seller_id = oi.seller_id WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2017 GROUP BY 1, 2 ORDER BY n DESC LIMIT 5","SELECT s.city, s.state, COUNT(*) AS n FROM fact_sales f
 JOIN dim_date d ON d.date_key = f.purchase_date_key
-JOIN dim_seller s ON s.seller_key = f.seller_key WHERE d.year = 2018 GROUP BY 1 ORDER BY n DESC LIMIT 5","SELECT sci.city_name, COUNT(*) AS n FROM fact_sales f
+JOIN dim_seller s ON s.seller_key = f.seller_key WHERE d.year = 2017 GROUP BY 1, 2 ORDER BY n DESC LIMIT 5","SELECT sci.city_name, sst.state_code, COUNT(*) AS n FROM fact_sales f
 JOIN dim_date d ON d.date_key = f.purchase_date_key
 JOIN dim_month dm ON dm.month_key = d.month_key
 JOIN dim_seller s ON s.seller_key = f.seller_key
 JOIN dim_city sci ON sci.city_key = s.city_key
-JOIN dim_state sst ON sst.state_key = sci.state_key WHERE dm.year_key = 2018 GROUP BY 1 ORDER BY n DESC LIMIT 5",ya,5,
+JOIN dim_state sst ON sst.state_key = sci.state_key WHERE dm.year_key = 2017 GROUP BY 1, 2 ORDER BY n DESC LIMIT 5",ya,5,
 Q032,L2,waktu,tidak,"Untuk tahun 2017, tampilkan nomor hari dalam seminggu (1 = Senin sampai 7 = Minggu) dan jumlah pesanannya, urutkan dari Senin.","SELECT EXTRACT(ISODOW FROM o.order_purchase_timestamp)::int, COUNT(DISTINCT oi.order_id) FROM order_items oi
 JOIN orders o ON o.order_id = oi.order_id WHERE EXTRACT(YEAR FROM o.order_purchase_timestamp)::int = 2017 GROUP BY 1 ORDER BY 1","SELECT d.day_of_week, COUNT(DISTINCT f.order_id) FROM fact_sales f
 JOIN dim_date d ON d.date_key = f.purchase_date_key WHERE d.year = 2017 GROUP BY 1 ORDER BY 1","SELECT d.day_of_week, COUNT(DISTINCT f.order_id) FROM fact_sales f
@@ -529,13 +529,13 @@ LEFT JOIN dim_date dd ON dd.date_key = f.delivered_customer_date_key WHERE d.yea
 JOIN dim_date d ON d.date_key = f.purchase_date_key
 JOIN dim_month dm ON dm.month_key = d.month_key
 LEFT JOIN dim_date dd ON dd.date_key = f.delivered_customer_date_key WHERE dm.year_key = 2018 AND dd.full_date IS NOT NULL) x GROUP BY 1 ORDER BY 1",ya,8,
-Q072,L3,penjual,tidak,"Kota penjual mana saja yang memiliki minimal 50 penjual berbeda? Tampilkan nama kota dan jumlah penjualnya, urutkan dari terbanyak.","SELECT se.seller_city, COUNT(DISTINCT oi.seller_id) AS n FROM order_items oi
+Q072,L3,penjual,tidak,"Kota penjual mana saja yang memiliki minimal 50 penjual berbeda? Tampilkan nama kota, negara bagiannya, dan jumlah penjualnya, urutkan dari terbanyak.","SELECT se.seller_city, se.seller_state, COUNT(DISTINCT oi.seller_id) AS n FROM order_items oi
 JOIN orders o ON o.order_id = oi.order_id
-JOIN sellers se ON se.seller_id = oi.seller_id GROUP BY 1 HAVING COUNT(DISTINCT oi.seller_id) >= 50 ORDER BY n DESC","SELECT s.city, COUNT(DISTINCT s.seller_id) AS n FROM fact_sales f
-JOIN dim_seller s ON s.seller_key = f.seller_key GROUP BY 1 HAVING COUNT(DISTINCT s.seller_id) >= 50 ORDER BY n DESC","SELECT sci.city_name, COUNT(DISTINCT s.seller_id) AS n FROM fact_sales f
+JOIN sellers se ON se.seller_id = oi.seller_id GROUP BY 1, 2 HAVING COUNT(DISTINCT oi.seller_id) >= 50 ORDER BY n DESC","SELECT s.city, s.state, COUNT(DISTINCT s.seller_id) AS n FROM fact_sales f
+JOIN dim_seller s ON s.seller_key = f.seller_key GROUP BY 1, 2 HAVING COUNT(DISTINCT s.seller_id) >= 50 ORDER BY n DESC","SELECT sci.city_name, sst.state_code, COUNT(DISTINCT s.seller_id) AS n FROM fact_sales f
 JOIN dim_seller s ON s.seller_key = f.seller_key
 JOIN dim_city sci ON sci.city_key = s.city_key
-JOIN dim_state sst ON sst.state_key = sci.state_key GROUP BY 1 HAVING COUNT(DISTINCT s.seller_id) >= 50 ORDER BY n DESC",ya,6,
+JOIN dim_state sst ON sst.state_key = sci.state_key GROUP BY 1, 2 HAVING COUNT(DISTINCT s.seller_id) >= 50 ORDER BY n DESC",ya,6,
 Q073,L3,"produk,status",tidak,Kategori produk mana saja yang memiliki lebih dari 20 item dari pesanan yang dibatalkan? Tampilkan kategori dan jumlah itemnya.,"SELECT t.product_category_name_english, COUNT(*) FROM order_items oi
 JOIN orders o ON o.order_id = oi.order_id
 JOIN products pr ON pr.product_id = oi.product_id

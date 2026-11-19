@@ -118,8 +118,8 @@ q("Q030", "L2", "status", False,
   "Tampilkan setiap status pesanan beserta jumlah itemnya, urutkan dari yang terbanyak.",
   "SELECT {status}, COUNT(*) AS n FROM {FROM} GROUP BY 1 ORDER BY n DESC", urut=True)
 q("Q031", "L2", "penjual,waktu", False,
-  "Sebutkan 5 kota penjual dengan jumlah item terjual terbanyak pada tahun 2018 beserta jumlah itemnya.",
-  "SELECT {scity}, COUNT(*) AS n FROM {FROM} WHERE {year} = 2018 GROUP BY 1 ORDER BY n DESC LIMIT 5", urut=True)
+  "Sebutkan 5 kota penjual dengan jumlah item terjual terbanyak pada tahun 2017, beserta negara bagian kota tersebut dan jumlah itemnya.",
+  "SELECT {scity}, {sstate}, COUNT(*) AS n FROM {FROM} WHERE {year} = 2017 GROUP BY 1, 2 ORDER BY n DESC LIMIT 5", urut=True)
 q("Q032", "L2", "waktu", False,
   "Untuk tahun 2017, tampilkan nomor hari dalam seminggu (1 = Senin sampai 7 = Minggu) dan jumlah pesanannya, urutkan dari Senin.",
   "SELECT {dow}, COUNT(DISTINCT {order}) FROM {FROM} WHERE {year} = 2017 GROUP BY 1 ORDER BY 1", urut=True)
@@ -267,8 +267,8 @@ q("Q071", "L3", "pengiriman,waktu", True,
   "SELECT mo, ROUND(AVG(lama), 2) FROM (SELECT DISTINCT {order} AS oid, {month} AS mo, {ddate} - {pdate} AS lama "
   "FROM {FROM} WHERE {year} = 2018 AND {ddate} IS NOT NULL) x GROUP BY 1 ORDER BY 1", urut=True)
 q("Q072", "L3", "penjual", False,
-  "Kota penjual mana saja yang memiliki minimal 50 penjual berbeda? Tampilkan nama kota dan jumlah penjualnya, urutkan dari terbanyak.",
-  "SELECT {scity}, COUNT(DISTINCT {seller}) AS n FROM {FROM} GROUP BY 1 HAVING COUNT(DISTINCT {seller}) >= 50 "
+  "Kota penjual mana saja yang memiliki minimal 50 penjual berbeda? Tampilkan nama kota, negara bagiannya, dan jumlah penjualnya, urutkan dari terbanyak.",
+  "SELECT {scity}, {sstate}, COUNT(DISTINCT {seller}) AS n FROM {FROM} GROUP BY 1, 2 HAVING COUNT(DISTINCT {seller}) >= 50 "
   "ORDER BY n DESC", urut=True)
 q("Q073", "L3", "produk,status", False,
   "Kategori produk mana saja yang memiliki lebih dari 20 item dari pesanan yang dibatalkan? Tampilkan kategori dan jumlah itemnya.",
