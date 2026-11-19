@@ -35,6 +35,10 @@ META = ["M1", "M2", "M3"]
 TINGKAT = ["L1", "L2", "L3", "L4"]
 ALPHA = 0.05
 Z_BONF = float(stats.norm.ppf(1 - ALPHA / 2 / 3))  # 2,394
+
+
+def zb(k):
+    return float(stats.norm.ppf(1 - ALPHA / 2 / k))
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output")
 
 
@@ -62,6 +66,8 @@ def load(path):
     df = df[df["status"] != "api_error"].copy()
     df["benar"] = df["benar"].astype(int)
     df["skema"] = pd.Categorical(df["skema"], SKEMA)
+    global META
+    META = [m for m in ["M1", "M2", "M3"] if m in set(df["metadata"])]
     df["meta"] = pd.Categorical(df["metadata"], META)
     df["soal"] = df["id"]
     n = df.groupby(["skema", "meta"], observed=False).size()
@@ -100,6 +106,7 @@ def contrast(res, a, b):
 
 
 def main():
+    global META
     if len(sys.argv) < 2:
         sys.exit("Pakai: python analisis/analisis.py hasil/<file>.csv")
     os.makedirs(OUT, exist_ok=True)
@@ -114,10 +121,12 @@ def main():
     ex.index = [NAMA_SKEMA.get(i, i) for i in ex.index]
     ex.round(1).to_csv(os.path.join(OUT, "tabel_akurasi.csv"))
     L += ["## Tabel 4.1 Akurasi eksekusi (%) per kombinasi", "",
-          "| Model skema | M1 | M2 | M3 | Rata-rata skema |", "|---|---|---|---|---|"]
+          "| Model skema | " + " | ".join(META) + " | Rata-rata skema |", "|---" * (len(META) + 2) + "|"]
     for i, r in ex.iterrows():
         L.append(f"| {i} | " + " | ".join(fmt(v, 1) for v in r.values) + " |")
-    best = df.groupby(["skema", "meta"], observed=False)["benar"].mean().idxmax()
+    cell = df.groupby(["skema", "meta"], observed=False)["benar"].mean()
+    ekstrem = [f"{NAMA_SKEMA[a]}+{b} = {v * 100:.0f}%" for (a, b), v in cell.items() if v in (0.0, 1.0)]
+    best = cell.idxmax()
     L += ["", f"Kombinasi terbaik: {NAMA_SKEMA[best[0]]} + {best[1]}.", ""]
 
     # ---------------- 2. Regresi logistik ----------------
@@ -128,6 +137,10 @@ def main():
     w_i = wald(m_int, lambda n: ":" in n)
     uji = [("RM1 Model skema", *w_s), ("RM2 Kelengkapan metadata", *w_m), ("RM3 Interaksi skema × metadata", *w_i)]
     pd.DataFrame(uji, columns=["faktor", "chi2", "df", "p"]).to_csv(os.path.join(OUT, "tabel_uji_faktor.csv"), index=False)
+    if ekstrem:
+        L += ["> **PERINGATAN:** ada kombinasi dengan akurasi 0% atau 100% (" + "; ".join(ekstrem) + "). "
+              "Regresi logistik tidak dapat menaksir pengaruh dengan wajar pada sel seperti ini "
+              "(*ceiling/floor effect*), sehingga nilai χ² dan OR yang melibatkan sel tersebut tidak dapat dipercaya.", ""]
     L += ["## Tabel 4.2 Uji pengaruh keseluruhan (regresi logistik GEE, uji Wald)", "",
           "| Faktor | χ² | df | p | Kesimpulan |", "|---|---|---|---|---|"]
     for f, c, d, p in uji:
@@ -135,19 +148,20 @@ def main():
 
     # pasangan (model efek utama), koreksi Holm per faktor
     ps = {"oltp": None, "star": "C(skema)[T.star]", "snowflake": "C(skema)[T.snowflake]"}
-    pm = {"M1": None, "M2": "C(meta)[T.M2]", "M3": "C(meta)[T.M3]"}
+    pm = {m: (None if m == META[0] else f"C(meta)[T.{m}]") for m in META}
     pairs = [("RM1", NAMA_SKEMA[a], NAMA_SKEMA[b], ps[a], ps[b]) for a, b in
              [("star", "oltp"), ("snowflake", "oltp"), ("star", "snowflake")]]
-    pairs += [("RM2", a, b, pm[a], pm[b]) for a, b in [("M2", "M1"), ("M3", "M1"), ("M3", "M2")]]
+    pairs += [("RM2", a, b, pm[a], pm[b]) for a, b in [("M2", "M1"), ("M3", "M1"), ("M3", "M2")]
+              if a in pm and b in pm]
     rows = []
     for grp in ("RM1", "RM2"):
         sub = [p for p in pairs if p[0] == grp]
         res = [contrast(m_main, p[3], p[4]) for p in sub]
-        adj = [min(1.0, 3 * r[2]) for r in res]
+        adj = [min(1.0, len(sub) * r[2]) for r in res]
         for p, r, pa in zip(sub, res, adj):
             est, se, _ = r
             rows.append(dict(rm=grp, banding=f"{p[1]} vs {p[2]}", OR=np.exp(est),
-                             lo=np.exp(est - Z_BONF * se), hi=np.exp(est + Z_BONF * se), p_terkoreksi=pa))
+                             lo=np.exp(est - zb(len(sub)) * se), hi=np.exp(est + zb(len(sub)) * se), p_terkoreksi=pa))
     orr = pd.DataFrame(rows)
     orr.to_csv(os.path.join(OUT, "tabel_odds_ratio.csv"), index=False)
     L += ["", "## Tabel 4.3 Odds ratio per pasangan (p dan selang dikoreksi Bonferroni)", "",
@@ -164,23 +178,24 @@ def main():
     L += ["## Tabel 4.4 Kenaikan akurasi M1 → M3 per skema (pendukung RM3)", "",
           "| Model skema | M1 | M3 | Kenaikan (poin) | Tertolong | Terganggu |", "|---|---|---|---|---|---|"]
     w = df.pivot_table(index=["soal", "skema"], columns="meta", values="benar", observed=False).reset_index()
+    lo_m, hi_m = META[0], META[-1]
     for s in SKEMA:
         x = w[w["skema"] == s]
-        a, b = x["M1"].mean() * 100, x["M3"].mean() * 100
-        tol = int(((x["M1"] == 0) & (x["M3"] == 1)).sum())
-        gg = int(((x["M1"] == 1) & (x["M3"] == 0)).sum())
+        a, b = x[lo_m].mean() * 100, x[hi_m].mean() * 100
+        tol = int(((x[lo_m] == 0) & (x[hi_m] == 1)).sum())
+        gg = int(((x[lo_m] == 1) & (x[hi_m] == 0)).sum())
         L.append(f"| {NAMA_SKEMA[s]} | {fmt(a, 1)} | {fmt(b, 1)} | {fmt(b - a, 1)} | {tol} | {gg} |")
 
     # ---------------- 3. Temuan pendukung ----------------
     if "tingkat" in df:
         t = df.pivot_table(index="tingkat", columns="meta", values="benar", aggfunc="mean", observed=False) * 100
-        L += ["", "## Tabel 4.5 Akurasi (%) per tingkat kesulitan", "", "| Tingkat | M1 | M2 | M3 |", "|---|---|---|---|"]
-        for i, r in t.reindex(TINGKAT).iterrows():
+        L += ["", "## Tabel 4.5 Akurasi (%) per tingkat kesulitan", "", "| Tingkat | " + " | ".join(META) + " |", "|---" * (len(META) + 1) + "|"]
+        for i, r in t.reindex([x for x in TINGKAT if x in t.index]).iterrows():
             L.append(f"| {i} | " + " | ".join(fmt(v, 1) for v in r.values) + " |")
     if "butuh_glosarium" in df:
         g = df.pivot_table(index="butuh_glosarium", columns="meta", values="benar", aggfunc="mean", observed=False) * 100
         L += ["", "## Tabel 4.6 Akurasi (%) menurut pemakaian istilah bisnis", "",
-              "| Butuh glosarium | M1 | M2 | M3 |", "|---|---|---|---|"]
+              "| Butuh glosarium | " + " | ".join(META) + " |", "|---" * (len(META) + 1) + "|"]
         for i, r in g.iterrows():
             L.append(f"| {i} | " + " | ".join(fmt(v, 1) for v in r.values) + " |")
     st = df.pivot_table(index="status", columns="skema", values="benar", aggfunc="size", fill_value=0, observed=False)
